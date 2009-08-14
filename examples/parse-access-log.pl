@@ -88,7 +88,8 @@ while $line = $f.get {
     %user{$<ip> ~ $<user_agent>}++;
 }
 
-my $svg = SVG::Plot.new(:width(600), :height(400)).plot(@visitor_per_day);
+my $svg = SVG::Plot.new(:width(600), :height(400), :fill-width(1))\
+          .plot(@visitor_per_day);
 say SVG.serialize($svg);
 
 # vim: ft=perl6

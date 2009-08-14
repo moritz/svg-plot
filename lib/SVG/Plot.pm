@@ -1,7 +1,8 @@
 
 class SVG::Plot {
-    has $.height = 200;
-    has $.width  = 300;
+    has $.height        = 200;
+    has $.width         = 300;
+    has $.fill-width    = 0.80;
 
     method plot(@data, :$full = True) {
         my $max_x = 0;
@@ -11,14 +12,14 @@ class SVG::Plot {
             for @data.kv -> $k, $v {
                 take 'rect' => [
                     :y(0),
-                    :x($k * 40),
-                    :width(35),
+                    :x($k),
+                    :width($.fill-width),
                     :height($v),
                     :style<fill:blue>,
                 ];
-                $max_x = ($k + 1) * 40;
                 $max_y max= $v;
             }
+            $max_x = +@data;
         }
 
         my @transformation = (
