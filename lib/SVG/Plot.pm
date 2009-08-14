@@ -16,11 +16,10 @@ class SVG::Plot {
                     :height($v),
                     :style<fill:blue>,
                 ];
-                $max_x = $k * 40;
+                $max_x = ($k + 1) * 40;
                 $max_y max= $v;
             }
         }
-
 
         my @transformation = (
                 $.width / $max_x,   # scaling in x direction,
@@ -56,7 +55,7 @@ class SVG::Plot {
         return $full
             ??  
                 :svg([
-                        :width(320), :height(220),
+                        :width($.width), :height($.height),
                         'xmlns:svg' => 'http://www.w3.org/2000/svg',
                         @svg
                 ])
