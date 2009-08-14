@@ -56,7 +56,14 @@ my $svg = :svg([
         :x2($width),
         :y2($height),
         :style('stroke:black; stroke-width: 2'),
-    ];
+    ],
+    'line' => [
+        :x1(0),
+        :y1(0),
+        :x2(0),
+        :y2($height),
+        :style('stroke:black; stroke-width: 2'),
+    ],
 ]);
 
 say SVG.serialize($svg);
