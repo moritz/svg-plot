@@ -10,7 +10,6 @@ my @labels  = <the quick brown fox jumps over the lazy red dog>;
 my $svg = SVG::Plot.new(
         width           => 300,
         height          => 250,
-        plot-height     => 200,
         ).plot(@data, @labels);
 
 say SVG.serialize($svg);

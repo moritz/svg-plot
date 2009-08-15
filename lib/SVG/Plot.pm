@@ -3,16 +3,21 @@ class SVG::Plot {
     has $.height        = 200;
     has $.width         = 300;
     has $.fill-width    = 0.80;
-    has $.font-size     = 14;
+    has $.label-font-size     = 14;
     has $.plot-width    = $.width  * 0.80;
-    has $.plot-height   = $.height * 0.80;
+    has $.plot-height   = $.height * 0.65;
 
-    has $.max-labels    = $.plot-width / (1.5 * $.font-size);
+    has $.y-tick-step   = -> $max_y {
+        10 ** floor(log10($max_y)) / 5
+    }
+
+    has $.max-x-labels  = $.plot-width / (1.5 * $.label-font-size);
+    has $.max-y-labels  = $.plot-height / (2  * $.label-font-size);
 
     has $.label-spacing = ($.height - $.plot-height) / 20;
 
     method plot(@data, @labels = @data.keys, :$full = True) {
-        my $label-skip = ceiling(@data / $.max-labels);
+        my $label-skip = ceiling(@data / $.max-x-labels);
         my $max_x = +@data;
         my $max_y = [max] @data;
 
@@ -35,22 +40,22 @@ class SVG::Plot {
                     # coordinates first: 
                     # x -> - y 
                     # y ->   x
-                    my $t-offset = 0.5 * ($step_x - $.font-size);
+                    my $t-offset = 0.5 * ($step_x - $.label-font-size);
                     take 'text' => [
                         :transform('rotate(90)'),
                         :y(-$k * $step_x - $t-offset),
                         :x($.label-spacing),
-                        :font-size($.font-size),
+                        :font-size($.label-font-size),
                         ~$l,
                     ];
                 }
 
             }
-            $max_x = +@data;
+            self!y-ticks($max_y, $step_y);
         }
 
         my $x-trafo = 0.8 * ($.width - $.plot-width);
-        my $y-trafo = $.plot-height + 0.5 * ($.height - $.plot-height);
+        my $y-trafo = $.plot-height + 0.3 * ($.height - $.plot-height);
         my $trafo = "translate($x-trafo,$y-trafo)";
 
         my @svg = 'g' => [
@@ -81,6 +86,27 @@ class SVG::Plot {
                         @svg
                 ])
             !! @svg;
+    }
+
+    method !y-ticks($max_y, $scale_y) {
+        my $step = ($.y-tick-step).($max_y);
+        loop (my $y = 0; $y <= $max_y; $y += $step) {
+            take 'line' => [
+                :x1(-$.label-spacing / 2),
+                :x2( $.label-spacing / 2),
+                :y1(-$y * $scale_y),
+                :y2(-$y * $scale_y),
+                :style('stroke:black; stroke-width: 1'),
+            ];
+            take 'text' => [
+                :x(-$.label-spacing
+                        - $.label-font-size * chars($max_y.Int) / 1.2
+                       ),
+                :y(-$y * $scale_y + $.label-font-size / 2),
+                :font-size($.label-font-size),
+                ~ $y,
+            ];
+        }
     }
 }
 

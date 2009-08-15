@@ -79,14 +79,12 @@ while $line = $f.get {
     my $date = sprintf '%04d%02d%02d', $<date>[2], 
                        %months{$<date>[1]}, $<date>[0];
     $prev_date //= $date;
-    $prev_human_date //= ~$<date>.substr(1);
 
     if $prev_date ne $date {
         @visitor_per_day.push:  +%user;
-        @dates.push:            $prev_human_date;
+        @dates.push:            ~$prev_date;
         %user = ();
         $prev_date = $date;
-        $prev_human_date = ~$<date>.substr(1);
     }
 
 
@@ -95,7 +93,7 @@ while $line = $f.get {
 
 my $svg = SVG::Plot.new(
         :width(600),
-        :height(500),
+        :height(550),
         :plot-height(400),
         :fill-width(1),
     ).plot(@visitor_per_day, @dates);
