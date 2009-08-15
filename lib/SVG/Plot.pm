@@ -3,36 +3,53 @@ class SVG::Plot {
     has $.height        = 200;
     has $.width         = 300;
     has $.fill-width    = 0.80;
+    has $.font-size     = 14;
+    has $.plot-width    = $.width  * 0.80;
+    has $.plot-height   = $.height * 0.80;
 
-    method plot(@data, :$full = True) {
-        my $max_x = 0;
-        my $max_y = 0;
+    has $.max-labels    = $.plot-width / (1.5 * $.font-size);
+
+    has $.label-spacing = ($.height - $.plot-height) / 20;
+
+    method plot(@data, @labels = @data.keys, :$full = True) {
+        my $label-skip = ceiling(@data / $.max-labels);
+        my $max_x = +@data;
+        my $max_y = [max] @data;
+
+        my $step_x = $.plot-width  / $max_x;
+        my $step_y = $.plot-height / $max_y;
 
         my @svg_d = gather {
-            for @data.kv -> $k, $v {
+            for @data.keys Z @data.values Z @labels -> $k, $v, $l {
                 take 'rect' => [
-                    :y(0),
-                    :x($k),
-                    :width($.fill-width),
-                    :height($v),
+                    :y(-$v * $step_y),
+                    :x($k * $step_x),
+                    :width($.fill-width * $step_x),
+                    :height($v * $step_y),
                     :style<fill:blue>,
                 ];
-                $max_y max= $v;
+
+                if $k !% $label-skip {
+                    # note that the rotation is applied first,
+                    # so we have to  transform our 
+                    # coordinates first: 
+                    # x -> - y 
+                    # y ->   x
+                    my $t-offset = 0.5 * ($step_x - $.font-size);
+                    take 'text' => [
+                        :transform('rotate(90)'),
+                        :y(-$k * $step_x - $t-offset),
+                        :x($.label-spacing),
+                        :font-size($.font-size),
+                        ~$l,
+                    ];
+                }
+
             }
             $max_x = +@data;
         }
 
-        my @transformation = (
-                $.width / $max_x,   # scaling in x direction,
-                0,                  # x-y skew
-                0,                  # y-x skew
-                -$.height / $max_y, # scaling in y direction,
-                                    # negative, since SVG defines the
-                                    # positive y axis downwards
-                0,                  # translation x
-                $.height,           # translation y
-        );
-        my $trafo = 'matrix(' ~ @transformation.join(',') ~ ')';
+        my $trafo = "translate(0,$.plot-height)";
 
         my @svg = 'g' => [
                 :transform($trafo),
