@@ -57,6 +57,7 @@ class SVG::Plot {
             ??  
                 :svg([
                         :width($.width), :height($.height),
+                        'xmlns' => 'http://www.w3.org/2000/svg',
                         'xmlns:svg' => 'http://www.w3.org/2000/svg',
                         @svg
                 ])
