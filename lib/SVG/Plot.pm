@@ -64,4 +64,22 @@ class SVG::Plot {
     }
 }
 
+=begin Pod
+
+=head1 NAME
+
+SVG::Plot - simple SVG bar charts
+
+=head1 SYNOPSIS
+
+    use SVG;
+    use SVG::Plot
+
+    my @data = (0..100).map: { sin($_ / 10) };
+    my $svg = SVG::Plot.new( width => 400, height => 250, fill-width => 1)\
+              .plot(@data);
+    say SVG.serialize($svg);
+
+=end Pod
+
 # vim: ft=perl6
