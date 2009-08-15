@@ -69,27 +69,37 @@ my $line;
 my %months = <Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dez> Z 1..12;
 
 my $prev_date;
+my $prev_human_date;
 my %user;
 my @visitor_per_day;
+my @dates;
 
 while $line = $f.get {
     AccessLog.parse($line) or next;
     my $date = sprintf '%04d%02d%02d', $<date>[2], 
                        %months{$<date>[1]}, $<date>[0];
     $prev_date //= $date;
+    $prev_human_date //= ~$<date>.substr(1);
 
     if $prev_date ne $date {
-        push @visitor_per_day, +%user;
+        @visitor_per_day.push:  +%user;
+        @dates.push:            $prev_human_date;
         %user = ();
         $prev_date = $date;
+        $prev_human_date = ~$<date>.substr(1);
     }
 
 
     %user{$<ip> ~ $<user_agent>}++;
 }
 
-my $svg = SVG::Plot.new(:width(600), :height(400), :fill-width(1))\
-          .plot(@visitor_per_day);
+my $svg = SVG::Plot.new(
+        :width(600),
+        :height(500),
+        :plot-height(400),
+        :fill-width(1),
+    ).plot(@visitor_per_day, @dates);
+
 say SVG.serialize($svg);
 
 # vim: ft=perl6

@@ -49,26 +49,28 @@ class SVG::Plot {
             $max_x = +@data;
         }
 
-        my $trafo = "translate(0,$.plot-height)";
+        my $x-trafo = 0.8 * ($.width - $.plot-width);
+        my $y-trafo = $.plot-height + 0.5 * ($.height - $.plot-height);
+        my $trafo = "translate($x-trafo,$y-trafo)";
 
         my @svg = 'g' => [
-                :transform($trafo),
-                @svg_d,
-                ],
-                'line' => [
-                    :x1(0),
-                    :y1($.height),
-                    :x2($.width),
-                    :y2($.height),
-                    :style('stroke:black; stroke-width: 2'),
-                ],
-                'line' => [
-                    :x1(0),
-                    :y1(0),
-                    :x2(0),
-                    :y2($.height),
-                    :style('stroke:black; stroke-width: 2'),
-                ];
+            :transform($trafo),
+            @svg_d,
+            'line' => [
+                :x1(0),
+                :y1(0),
+                :x2($.plot-width),
+                :y2(0),
+                :style('stroke:black; stroke-width: 2'),
+            ],
+            'line' => [
+                :x1(0),
+                :y1(0),
+                :x2(0),
+                :y2(-$.plot-height),
+                :style('stroke:black; stroke-width: 2'),
+            ],
+        ];
 
         return $full
             ??  
