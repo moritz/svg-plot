@@ -30,7 +30,7 @@ grammar AccessLog {
     }
 
     token ipv6 {
-        <[0..9 :]>+     # need a better regex 
+        <[0..9 :]>+     # need a better regex
     }
 
     token dummy { '-' }
@@ -51,12 +51,12 @@ grammar AccessLog {
 
     token referrer { \" <-[ " ]>* \" }
 
-    token user_agent { 
-        \" ~ \" 
-        [ 
+    token user_agent {
+        \" ~ \"
+        [
             | <-[ " ]>
             | \\ \"
-        ]* 
+        ]*
     }
 }
 
@@ -76,7 +76,7 @@ my @dates;
 
 while $line = $f.get {
     AccessLog.parse($line) or next;
-    my $date = sprintf '%04d%02d%02d', $<date>[2], 
+    my $date = sprintf '%04d-%02d-%02d', $<date>[2],
                        %months{$<date>[1]}, $<date>[0];
     $prev_date //= $date;
 
