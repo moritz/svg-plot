@@ -15,7 +15,10 @@ class SVG::Plot {
 
     has $.label-spacing     = ($.height - $.plot-height) / 20;
 
-    method plot(@data, @labels = @data.keys, :$full = True) {
+    method plot(@data,
+                @labels     = @data.keys,
+                :$full      = True,
+            ) {
         my $label-skip = ceiling(@data / $.max-x-labels);
         my $max_x = +@data;
         my $max_y = [max] @data;
@@ -124,6 +127,68 @@ SVG::Plot - simple SVG bar charts
     my $svg = SVG::Plot.new( width => 400, height => 250, fill-width => 1)\
               .plot(@data);
     say SVG.serialize($svg);
+
+=head1 DESCRIPTION
+
+SVG::Plot turns a set of data points (and optionally labels) into a data
+structure which Carl Mäsak's module L<SVG> serializes into SVG, and displays a
+bar chart of the data.
+
+See L<http://perlgeek.de/blog-en/perl-6/svg-adventures.html> for the initial
+announcement and future plans.
+
+Note that the module itself does not depend on SVG.pm, only the examples (and
+maybe in future the tests).
+
+=head1 A WORD OF WARNING
+
+Please note that the interface of this module is still in flux, and might
+change without further notice. If you actually use it, send the author an
+email to inform him, maybe he'll try to keep the interface backwards
+compatible, or notify you on incompatible changes.
+
+=head1 METHODS
+
+=head2 new(*%options)
+Constructs a L<Plot::SVG> object. You can set various attributes as options,
+see their documentation below. No attribute is mandatory.
+
+=head2 method plot(@data, @labels = @data.keys, :$full = True)
+Creates a data structure describing a bar chart. C<@data> should contain
+numerical values, each of which maps to the height of a single bar.
+C<@labels> contains the labels to be printed, and should contain the same
+number of items as C<@data>. If C<@labels> is omitted, the values 0, 1, 2 etc.
+are assumed as labels.
+
+If the argument C<$!full> is provided, the returned data structure contains
+only the body of the SVG, not the C<< <svg xmlns=...> >> header.
+
+=head1 Attributes
+
+The following attributes can be set with the C<new> constructor, and can be
+queried later on
+
+=head2 $.width
+=head2 $.height
+
+The overall size of the image (what is called the I<canvas> in SVG jargon).
+SVG::Plot tries not to draw outside the canvas.
+
+=head2 $.plot-width
+=head2 $.plot-height
+
+The size of the area to which the chart is plotted (the rest is taken up by
+ticks, labels and in future probably captions). The behaviour is undefined if
+C<< $.plot-width < $.width >> or C<< $.plot-height >>.
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2009 by Moritz A. Lenz, all rights reserved
+
+You may distribute, use and modify this module under the terms of the Artistic
+License 2.0 as published by The Perl Foundation. See the F<LICENSE> file for
+details.
 
 =end Pod
 
