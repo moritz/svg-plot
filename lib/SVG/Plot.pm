@@ -184,11 +184,19 @@ C<< $.plot-width < $.width >> or C<< $.plot-height >>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2009 by Moritz A. Lenz, all rights reserved
+Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see file
+F<AUTHORS>), all rights reserved
 
 You may distribute, use and modify this module under the terms of the Artistic
 License 2.0 as published by The Perl Foundation. See the F<LICENSE> file for
 details.
+
+The example code in the F<examples> directory and the examples from the
+documentation can be used, modified and distributed freely without any
+restrictions (think "public domain", except that by German law the author
+can't place things into the public domain).
+
+=head1 
 
 =end Pod
 
