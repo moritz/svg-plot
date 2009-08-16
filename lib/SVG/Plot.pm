@@ -12,7 +12,6 @@ class SVG::Plot {
     }
 
     has $.max-x-labels  = $.plot-width / (1.5 * $.label-font-size);
-    has $.max-y-labels  = $.plot-height / (2  * $.label-font-size);
 
     has $.label-spacing = ($.height - $.plot-height) / 20;
 
