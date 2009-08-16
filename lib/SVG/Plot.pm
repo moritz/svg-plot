@@ -7,7 +7,7 @@ class SVG::Plot {
     has $.plot-width    = $.width  * 0.80;
     has $.plot-height   = $.height * 0.65;
 
-    has $.y-tick-step   = -> $max_y {
+    has &.y-tick-step   = -> $max_y {
         10 ** floor(log10($max_y)) / 5
     }
 
@@ -89,7 +89,7 @@ class SVG::Plot {
     }
 
     method !y-ticks($max_y, $scale_y) {
-        my $step = ($.y-tick-step).($max_y);
+        my $step = (&.y-tick-step).($max_y);
         loop (my $y = 0; $y <= $max_y; $y += $step) {
             take 'line' => [
                 :x1(-$.label-spacing / 2),
