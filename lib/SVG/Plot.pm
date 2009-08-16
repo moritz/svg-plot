@@ -181,11 +181,38 @@ The size of the area to which the chart is plotted (the rest is taken up by
 ticks, labels and in future probably captions). The behaviour is undefined if
 C<< $.plot-width < $.width >> or C<< $.plot-height >>.
 
+Note that if you chose C<$.plot-width> or C<$.plot-height> too big in
+comparison to C<$.width> and C<$.height>, label texts and ticks might
+exceed the total size, and be either clipped to or drawn outside the canvas,
+depending on your SVG renderer.
+
+=head2 $.fill-width
+(Might be renamed to a more meaning name in future) For each bar in the bar
+chart a certain width is allocated, but only a ratio of C<$.fill-width>  is
+actually filled with a bar. Set to value between 0 and 1 to get spaces between
+your bars, or to 1 if you don't  want spaces.
+
+=head2 $.label-font-size
+Font size for the axis labels
+
+=head2 &.y-tick-step
+Closure which computes the step size in which ticks and labels on the y axis
+are drawn. It receives the maximal C<y> value as a single positional argument.
+
+=head2 $.max-x-labels
+Maximal number of plotted labels in C<x> direction. If you experience
+overlapping labels you might set this to a smaller value. The default is
+dependent on C<$.plot-width> and C<$.label-font-size>.
+
+=head2 $.label-spacing
+
+Distance between I<x> axis and labels. Also affects width of I<y> ticks and
+distance of labels and I<y> ticks.
 
 =head1 LICENSE AND COPYRIGHT
 
 Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see file
-F<AUTHORS>), all rights reserved
+F<AUTHORS>), all rights reserved.
 
 You may distribute, use and modify this module under the terms of the Artistic
 License 2.0 as published by The Perl Foundation. See the F<LICENSE> file for
@@ -195,8 +222,6 @@ The example code in the F<examples> directory and the examples from the
 documentation can be used, modified and distributed freely without any
 restrictions (think "public domain", except that by German law the author
 can't place things into the public domain).
-
-=head1 
 
 =end Pod
 
