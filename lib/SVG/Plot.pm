@@ -1,19 +1,19 @@
 
 class SVG::Plot {
-    has $.height        = 200;
-    has $.width         = 300;
-    has $.fill-width    = 0.80;
-    has $.label-font-size     = 14;
-    has $.plot-width    = $.width  * 0.80;
-    has $.plot-height   = $.height * 0.65;
+    has $.height            = 200;
+    has $.width             = 300;
+    has $.fill-width        = 0.80;
+    has $.label-font-size   = 14;
+    has $.plot-width        = $.width  * 0.80;
+    has $.plot-height       = $.height * 0.65;
 
-    has &.y-tick-step   = -> $max_y {
+    has &.y-tick-step       = -> $max_y {
         10 ** floor(log10($max_y)) / 5
     }
 
-    has $.max-x-labels  = $.plot-width / (1.5 * $.label-font-size);
+    has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
 
-    has $.label-spacing = ($.height - $.plot-height) / 20;
+    has $.label-spacing     = ($.height - $.plot-height) / 20;
 
     method plot(@data, @labels = @data.keys, :$full = True) {
         my $label-skip = ceiling(@data / $.max-x-labels);
