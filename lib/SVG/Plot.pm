@@ -15,26 +15,28 @@ class SVG::Plot {
 
     has $.label-spacing     = ($.height - $.plot-height) / 20;
 
-    method plot(@data,
-                @labels     = @data.keys,
-                :$full      = True,
-            ) {
-        my $label-skip = ceiling(@data / $.max-x-labels);
-        my $max_x = +@data;
-        my $max_y = [max] @data;
+    has @.values is rw;
+    has @.labels is rw = @.values.keys;
+    has @.links  is rw;
+
+    method plot(:$full = True) {
+        my $label-skip = ceiling(@.values / $.max-x-labels);
+        my $max_x = +@.values;
+        my $max_y = [max] @.values;
 
         my $step_x = $.plot-width  / $max_x;
         my $step_y = $.plot-height / $max_y;
 
         my @svg_d = gather {
-            for @data.keys Z @data.values Z @labels -> $k, $v, $l {
-                take 'rect' => [
+            for @.values.keys Z @.values.values Z @.labels -> $k, $v, $l {
+                my $p = 'rect' => [
                     :y(-$v * $step_y),
                     :x($k * $step_x),
                     :width($.fill-width * $step_x),
                     :height($v * $step_y),
                     :style<fill:blue>,
                 ];
+                take self!linkify($k, $p);
 
                 if $k !% $label-skip {
                     # note that the rotation is applied first,
@@ -43,13 +45,14 @@ class SVG::Plot {
                     # x -> - y 
                     # y ->   x
                     my $t-offset = 0.5 * ($step_x - $.label-font-size);
-                    take 'text' => [
+                    my $t = 'text' => [
                         :transform('rotate(90)'),
                         :y(-$k * $step_x - $t-offset),
                         :x($.label-spacing),
                         :font-size($.label-font-size),
                         ~$l,
                     ];
+                    take self!linkify($k, $t);
                 }
 
             }
@@ -85,6 +88,7 @@ class SVG::Plot {
                         :width($.width), :height($.height),
                         'xmlns' => 'http://www.w3.org/2000/svg',
                         'xmlns:svg' => 'http://www.w3.org/2000/svg',
+                        'xmlns:xlink' => 'http://www.w3.org/1999/xlink',
                         @svg
                 ])
             !! @svg;
@@ -106,9 +110,21 @@ class SVG::Plot {
                        ),
                 :y(-$y * $scale_y + $.label-font-size / 2),
                 :font-size($.label-font-size),
+                :text-anchor<end>,
                 ~ $y,
             ];
         }
+    }
+
+    method !linkify($key, $thing) {
+        my $link = @.links[$key];
+        defined($link)
+            ?? ('a' => [
+                    'xlink:href' => $link,
+                    :target<_top>,
+                    $thing
+                ])
+            !! $thing;
     }
 }
 
@@ -118,14 +134,21 @@ class SVG::Plot {
 
 SVG::Plot - simple SVG bar charts
 
+=head1 VERSION
+
+$very_early
+
 =head1 SYNOPSIS
 
     use SVG;
     use SVG::Plot
 
     my @data = (0..100).map: { sin($_ / 10) };
-    my $svg = SVG::Plot.new( width => 400, height => 250, fill-width => 1)\
-              .plot(@data);
+    my $svg = SVG::Plot.new(
+                width => 400,
+                height => 250,
+                values => @data,
+            ).plot();
     say SVG.serialize($svg);
 
 =head1 DESCRIPTION
@@ -153,20 +176,27 @@ compatible, or notify you on incompatible changes.
 Constructs a L<Plot::SVG> object. You can set various attributes as options,
 see their documentation below. No attribute is mandatory.
 
-=head2 method plot(@data, @labels = @data.keys, :$full = True)
-Creates a data structure describing a bar chart. C<@data> should contain
-numerical values, each of which maps to the height of a single bar.
-C<@labels> contains the labels to be printed, and should contain the same
-number of items as C<@data>. If C<@labels> is omitted, the values 0, 1, 2 etc.
-are assumed as labels.
-
+=head2 method plot(:$full = True)
 If the argument C<$!full> is provided, the returned data structure contains
 only the body of the SVG, not the C<< <svg xmlns=...> >> header.
 
 =head1 Attributes
 
 The following attributes can be set with the C<new> constructor, and can be
-queried later on
+queried later on (those marked with C<is rw> can also be set later on).
+
+=head2 @.values is rw
+The values to be plotted
+
+=head2 @.labels is rw
+The labels printed below the bars. Note that this must be either left empty
+(in which case C<@.values.keys> is used as a default), or of the same length
+as C<@.values>. To suppress printing of labels just set them all to the empty
+string, C<$svg.labels = ('' xx $svg.values.elems)>.
+
+=head2 @.links is rw
+If some values of @.links are set to defined values, the corresponding bars
+and labels will be turned into links
 
 =head2 $.width
 =head2 $.height
