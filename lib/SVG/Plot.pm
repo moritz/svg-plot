@@ -44,12 +44,12 @@ class SVG::Plot {
                     # coordinates first: 
                     # x -> - y 
                     # y ->   x
-                    my $t-offset = 0.5 * ($step_x - $.label-font-size);
                     my $t = 'text' => [
                         :transform('rotate(90)'),
-                        :y(-$k * $step_x - $t-offset),
+                        :y((-$k - 0.5 * $.fill-width) * $step_x),
                         :x($.label-spacing),
                         :font-size($.label-font-size),
+                        :dominant-baseline<middle>,
                         ~$l,
                     ];
                     take self!linkify($k, $t);
@@ -105,12 +105,11 @@ class SVG::Plot {
                 :style('stroke:black; stroke-width: 1'),
             ];
             take 'text' => [
-                :x(-$.label-spacing
-                        - $.label-font-size * chars($max_y.Int) / 1.2
-                       ),
-                :y(-$y * $scale_y + $.label-font-size / 2),
+                :x(- 1.5 * $.label-spacing),
+                :y(-$y * $scale_y),
                 :font-size($.label-font-size),
                 :text-anchor<end>,
+                :dominant-baseline<middle>,
                 ~ $y,
             ];
         }
