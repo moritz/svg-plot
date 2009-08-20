@@ -96,7 +96,7 @@ my $svg = SVG::Plot.new(
         :height(550),
         :plot-height(400),
         :fill-width(1),
-        :values(@visitor_per_day),
+        :values([@visitor_per_day]),
         :labels(@dates),
     ).plot();
 

@@ -7,7 +7,7 @@ has $.plot-width        = $.width  * 0.80;
 has $.plot-height       = $.height * 0.65;
 
 has &.y-tick-step       = -> $max_y {
-    10 ** floor(log10($max_y)) / 5
+    10 ** floor(log10($max_y)) / 2
 }
 
 has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
@@ -18,25 +18,63 @@ has @.values is rw;
 has @.labels is rw = @.values.keys;
 has @.links  is rw;
 
-method plot(:$full = True) {
-    my $label-skip = ceiling(@.values / $.max-x-labels);
-    my $max_x = +@.values;
-    my $max_y = [max] @.values;
+has @.colors = <blue red green yellow>;
 
-    my $step_x = $.plot-width  / $max_x;
-    my $step_y = $.plot-height / $max_y;
+method plot(:$full = True, :$stacked = False) {
+    my $label-skip = ceiling(@.values / $.max-x-labels);
+    my $max_x      = @.values[0].elems;
+    my $max_y = 0;
+    if $stacked {
+        # maximum value of the sum over each column
+        $max_y = [max] @.values[0].keys.map: {
+            [+] @.values.map: -> $a { $a[$_] }
+        };
+    } else {
+        $max_y =  [max] @.values.map: { [max] @($_) };
+    }
+    my $datasets   = +@.values;
+
+    my $step_x     = $.plot-width  / $max_x;
+    my $step_y     = $.plot-height / $max_y;
+
+    warn "stacked: $stacked";
 
     my @svg_d = gather {
-        for @.values.keys Z @.values.values Z @.labels -> $k, $v, $l {
-            my $p = 'rect' => [
-                :y(-$v * $step_y),
-                :x($k * $step_x),
-                :width($.fill-width * $step_x),
-                :height($v * $step_y),
-                :style<fill:blue>,
-            ];
-            take self!linkify($k, $p);
+        if $stacked {
+            my $bar-width = $.fill-width * $step_x;
+            for @.values[0].keys Z @.labels -> $k, $l {
+                my $y-offset  = 0;
+                for ^$datasets -> $d {
+                    my $v = @.values[$d][$k];
+                    my $p = 'rect' => [
+                        :y(-$v * $step_y - $y-offset),
+                        :x($k * $step_x),
+                        :width($bar-width),
+                        :height($v * $step_y),
+                        :style("fill:{ @.colors[$d % *] }"),
+                    ];
+                    $y-offset += $v * $step_y;
+                    take self!linkify($k, $p);
+                }
+            }
+        } else {
+            my $bar-width = $.fill-width * $step_x / $datasets;
+            for @.values[0].keys Z @.labels -> $k, $l {
+                for ^$datasets -> $d {
+                    my $v = @.values[$d][$k];
+                    my $p = 'rect' => [
+                        :y(-$v * $step_y),
+                        :x($k * $step_x + $d * $bar-width),
+                        :width($bar-width),
+                        :height($v * $step_y),
+                        :style("fill:{ @.colors[$d % *] }"),
+                    ];
+                    take self!linkify($k, $p);
+                }
+            }
+        }
 
+        for @.values[0].keys Z @.labels -> $k, $l {
             if $k !% $label-skip {
                 # note that the rotation is applied first,
                 # so we have to  transform our 
