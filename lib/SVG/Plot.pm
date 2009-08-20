@@ -15,13 +15,13 @@ has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
 has $.label-spacing     = ($.height - $.plot-height) / 20;
 
 has @.values is rw;
-has @.labels is rw = @.values.keys;
+has @.labels is rw = @.values[0].keys;
 has @.links  is rw;
 
 has @.colors = <blue red green yellow>;
 
 method plot(:$full = True, :$stacked = False) {
-    my $label-skip = ceiling(@.values / $.max-x-labels);
+    my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
     my $max_y = 0;
     if $stacked {

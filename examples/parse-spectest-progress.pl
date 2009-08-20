@@ -37,7 +37,7 @@ my $svg = SVG::Plot.new(
         :labels(@date),
         :max-x-labels(20),
         :y-tick-step(-> $m { 10 ** floor(log10($m)) / 2 }),
-    ).plot(:stacked);
+    ).plot();
 
 say SVG.serialize($svg);
 
