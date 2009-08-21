@@ -12,32 +12,33 @@ use Text::CSV::Simple;
 my $f = open('../../../rakudo/docs/spectest-progress.csv');
 my $csv = Text::CSV::Simple.new;
 $csv.parse_as_colnames($f.get) or die "can't parse column names";
-warn $csv.colnames.perl;
-
 my $line;
-my (@date, @pass, @fail, @todo, @skip);
+my (@date, @pass, @fail, @todo, @skip, @specskip);
 while $line = $f.get {
     unless $csv.parse($line) {
         warn "Can't parse line «$line»";
         next;
     }
-    @date.push: $csv.field('date');
+    @date.push: $csv.field('date').substr(0, 10);
     @pass.push: $csv.field('pass');
     @fail.push: $csv.field('fail');
     @todo.push: $csv.field('todo');
     @skip.push: $csv.field('skip');
+    @specskip.push: $csv.field('spec')
+            - [+] @pass[*-1], @fail[*-1], @todo[*-1], @skip[*-1];
 }
+my @data = [@pass], [@fail], [@todo], [@skip], [@specskip];
 
 my $svg = SVG::Plot.new(
-        :width(600),
+        :width(800),
         :height(550),
         :plot-height(400),
         :fill-width(1),
-        :values([@pass], [@fail], [@todo], [@skip]),
+        :values(@data),
         :labels(@date),
         :max-x-labels(20),
-        :y-tick-step(-> $m { 10 ** floor(log10($m)) / 2 }),
-    ).plot();
+        :colors<lawngreen red blue yellow lightgrey>,
+    ).plot(:stacked);
 
 say SVG.serialize($svg);
 

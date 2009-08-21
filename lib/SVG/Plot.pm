@@ -21,6 +21,7 @@ has @.links  is rw;
 has @.colors = <blue red green yellow>;
 
 method plot(:$full = True, :$stacked = False) {
+
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
     my $max_y = 0;
@@ -49,7 +50,7 @@ method plot(:$full = True, :$stacked = False) {
                         :x($k * $step_x),
                         :width($bar-width),
                         :height($v * $step_y),
-                        :style("fill:{ @.colors[$d % *] }"),
+                        :style("fill:{ @.colors[$d % *] }; stroke: none"),
                     ];
                     $y-offset += $v * $step_y;
                     take self!linkify($k, $p);
