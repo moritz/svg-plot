@@ -7,7 +7,7 @@ has $.plot-width        = $.width  * 0.80;
 has $.plot-height       = $.height * 0.65;
 
 has &.y-tick-step       = -> $max_y {
-    10 ** floor(log10($max_y)) / 5
+    10 ** floor(log10($max_y)) / 5.0
 }
 
 has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);

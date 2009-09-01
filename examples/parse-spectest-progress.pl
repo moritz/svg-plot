@@ -33,7 +33,7 @@ my $svg = SVG::Plot.new(
         :width(800),
         :height(550),
         :plot-height(400),
-        :fill-width(1),
+        :fill-width(1.01), # work a round a common SVG rendering bug
         :values(@data),
         :labels(@date),
         :max-x-labels(20),

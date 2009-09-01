@@ -61,12 +61,12 @@ grammar AccessLog {
 }
 
 
-my $f = open('access2.log');
+my $f = open('access.log');
 
 my $line;
 
 
-my %months = <Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dez> Z 1..12;
+my %months = <Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec> Z 1..12;
 
 my $prev_date;
 my $prev_human_date;
