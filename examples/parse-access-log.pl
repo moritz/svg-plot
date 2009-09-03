@@ -98,6 +98,7 @@ my $svg = SVG::Plot.new(
         :fill-width(1),
         :values([@visitor_per_day]),
         :labels(@dates),
+        :title<accesses on perl6.org>,
     ).plot(:bars);
 
 say SVG.serialize($svg);
