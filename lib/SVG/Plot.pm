@@ -226,11 +226,11 @@ method plot-x-labels(:$label-skip, :$step_x) {
 
 # plots coordinate system, title etc.
 multi method eyecandy() {
-    @.coordinate-system(),
+    @.plot-coordinate-system,
     @.plot-title,
 }
 
-method coordinate-system() {
+multi method plot-coordinate-system() {
     # RAKUDO: can't use explicit return with a flattening list
     'line' => [
         :x1(0),
