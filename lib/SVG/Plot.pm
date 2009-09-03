@@ -305,14 +305,15 @@ $very_early
 =head1 SYNOPSIS
 
     use SVG;
-    use SVG::Plot
+    use SVG::Plot;
 
     my @data = (0..100).map: { sin($_ / 10) };
     my $svg = SVG::Plot.new(
                 width => 400,
                 height => 250,
-                values => @data,
-            ).plot(:stacked-bars);
+                values => [[@data]],
+                title  => 'sin(x/10)',
+            ).plot(:lines);
     say SVG.serialize($svg);
 
 =head1 DESCRIPTION
