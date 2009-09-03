@@ -1,3 +1,4 @@
+
 class SVG::Plot;
 has $.height            = 200;
 has $.width             = 300;
@@ -73,26 +74,8 @@ method plot(:$full = True, :$stacked = False) {
             }
         }
 
-        for @.values[0].keys Z @.labels -> $k, $l {
-            if $k !% $label-skip {
-                # note that the rotation is applied first,
-                # so we have to  transform our 
-                # coordinates first: 
-                # x -> - y 
-                # y ->   x
-                my $t = 'text' => [
-                    :transform('rotate(90)'),
-                    :y((-$k - 0.5 * $.fill-width) * $step_x),
-                    :x($.label-spacing),
-                    :font-size($.label-font-size),
-                    :dominant-baseline<middle>,
-                    ~$l,
-                ];
-                take self!linkify($k, $t);
-            }
-
-        }
-        self!y-ticks($max_y, $step_y);
+        $.plot-x-labels(:$step_x, :$label-skip);
+        $.y-ticks($max_y, $step_y);
     }
 
     my $x-trafo = 0.8 * ($.width - $.plot-width);
@@ -130,7 +113,7 @@ method plot(:$full = True, :$stacked = False) {
         !! @svg;
 }
 
-method !y-ticks($max_y, $scale_y) {
+method y-ticks($max_y, $scale_y) {
     my $step = (&.y-tick-step).($max_y);
     loop (my $y = 0; $y <= $max_y; $y += $step) {
         take 'line' => [
@@ -148,6 +131,27 @@ method !y-ticks($max_y, $scale_y) {
             :dominant-baseline<middle>,
             ~ $y,
         ];
+    }
+}
+
+method plot-x-labels(:$label-skip, :$step_x) {
+    for @.values[0].keys Z @.labels -> $k, $l {
+        if $k !% $label-skip {
+            # note that the rotation is applied first,
+            # so we have to  transform our
+            # coordinates first:
+            # x -> - y
+            # y ->   x
+            my $t = 'text' => [
+                :transform('rotate(90)'),
+                :y((-$k - 0.5 * $.fill-width) * $step_x),
+                :x($.label-spacing),
+                :font-size($.label-font-size),
+                :dominant-baseline<middle>,
+                ~$l,
+            ];
+            take self!linkify($k, $t);
+        }
     }
 }
 
