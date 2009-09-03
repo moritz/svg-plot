@@ -138,6 +138,48 @@ multi method plot(:$full = True, :$points!) {
     @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
+multi method plot(:$full = True, :$lines!) {
+
+    my $label-skip = ceiling(@.values[0] / $.max-x-labels);
+    my $max_x      = @.values[0].elems;
+    my $max_y      = [max] @.values.map: { [max] @($_) };
+    my $datasets   = +@.values;
+
+    my $step_x     = $.plot-width  / $max_x;
+    my $step_y     = $.plot-height / $max_y;
+
+    my @svg_d = gather {
+        for ^$datasets -> $d {
+            my @previous-coordinates;
+            for @.values[0].keys Z @.labels -> $k, $l {
+                my $v = @.values[$d][$k];
+                my @coord = ($k + 0.5) * $step_x, -$v * $step_y;
+                if @previous-coordinates {
+                    my $p = 'line' => [
+                        :x1(@previous-coordinates[0]),
+                        :y1(@previous-coordinates[1]),
+                        :x2(@coord[0]),
+                        :y2(@coord[1]),
+                        :style("stroke:{ @.colors[$d % *] }; stroke-width: 1.5"),
+                    ];
+                    take self!linkify($k, $p);
+                }
+                @previous-coordinates = @coord;
+            }
+        }
+
+        $.plot-x-labels(:$step_x, :$label-skip);
+        $.y-ticks($max_y, $step_y);
+    }
+
+    my $svg = $.apply-coordinate-transform(
+        @svg_d,
+        @.coordinate-system(),
+    );
+
+    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+}
+
 method y-ticks($max_y, $scale_y) {
     my $step = (&.y-tick-step).($max_y);
     loop (my $y = 0; $y <= $max_y; $y += $step) {
@@ -287,7 +329,7 @@ only the body of the SVG, not the C<< <svg xmlns=...> >> header.
 
 Each multi method renders one type of chart, and has a mandatory named
 parameter with the name of the type. Currently available are C<bars>, 
-C<stacked-bars>, and C<points>.
+C<stacked-bars>, C<lines> and C<points>.
 
 =head1 Attributes
 
