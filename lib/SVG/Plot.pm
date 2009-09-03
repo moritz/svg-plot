@@ -328,7 +328,7 @@ If the argument C<$!full> is provided, the returned data structure contains
 only the body of the SVG, not the C<< <svg xmlns=...> >> header.
 
 Each multi method renders one type of chart, and has a mandatory named
-parameter with the name of the type. Currently available are C<bars>, 
+parameter with the name of the type. Currently available are C<bars>,
 C<stacked-bars>, C<lines> and C<points>.
 
 =head1 Attributes
