@@ -1,4 +1,3 @@
-
 class SVG::Plot;
 has $.height            = 200;
 has $.width             = 300;
@@ -85,6 +84,42 @@ multi method plot(:$full = True, :$bars!) {
                     :x($k * $step_x + $d * $bar-width),
                     :width($bar-width),
                     :height($v * $step_y),
+                    :style("fill:{ @.colors[$d % *] }"),
+                ];
+                take self!linkify($k, $p);
+            }
+        }
+
+        $.plot-x-labels(:$step_x, :$label-skip);
+        $.y-ticks($max_y, $step_y);
+    }
+
+    my $svg = $.apply-coordinate-transform(
+        @svg_d,
+        @.coordinate-system(),
+    );
+
+    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+}
+
+multi method plot(:$full = True, :$points!) {
+
+    my $label-skip = ceiling(@.values[0] / $.max-x-labels);
+    my $max_x      = @.values[0].elems;
+    my $max_y      = [max] @.values.map: { [max] @($_) };
+    my $datasets   = +@.values;
+
+    my $step_x     = $.plot-width  / $max_x;
+    my $step_y     = $.plot-height / $max_y;
+
+    my @svg_d = gather {
+        for @.values[0].keys Z @.labels -> $k, $l {
+            for ^$datasets -> $d {
+                my $v = @.values[$d][$k];
+                my $p = 'circle' => [
+                    :cy(-$v * $step_y),
+                    :cx(($k + 0.5) * $step_x),
+                    :r(3),
                     :style("fill:{ @.colors[$d % *] }"),
                 ];
                 take self!linkify($k, $p);
@@ -251,8 +286,8 @@ If the argument C<$!full> is provided, the returned data structure contains
 only the body of the SVG, not the C<< <svg xmlns=...> >> header.
 
 Each multi method renders one type of chart, and has a mandatory named
-parameter with the name of the type. Currently available are C<bars> and
-C<stacked-bars>.
+parameter with the name of the type. Currently available are C<bars>, 
+C<stacked-bars>, and C<points>.
 
 =head1 Attributes
 
