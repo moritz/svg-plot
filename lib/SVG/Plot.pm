@@ -307,6 +307,20 @@ $very_early
     use SVG;
     use SVG::Plot;
 
+    my @d1 = (0..100).map: { abs(sin($_ / 10.0)) };
+    my @d2 = (0..100).map: { abs(cos($_ / 10.0)) };
+    my $svg = SVG::Plot.new(
+                width => 400,
+                height => 250,
+                values => ([@d1], [@d2]),
+                title  => '|sin(x/10)|, |cos(x/10)|',
+            ).plot(:lines);
+    say SVG.serialize($svg);
+
+
+    use SVG;
+    use SVG::Plot;
+
     my @data = (0..100).map: { sin($_ / 10) };
     my $svg = SVG::Plot.new(
                 width => 400,
