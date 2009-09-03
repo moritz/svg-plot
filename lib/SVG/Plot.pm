@@ -21,7 +21,7 @@ has @.links  is rw;
 
 has @.colors = <blue red green yellow>;
 
-method plot(:$full = True, :$stacked = False) {
+multi method plot(:$full = True, :$stacked = False) {
 
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
@@ -78,39 +78,12 @@ method plot(:$full = True, :$stacked = False) {
         $.y-ticks($max_y, $step_y);
     }
 
-    my $x-trafo = 0.8 * ($.width - $.plot-width);
-    my $y-trafo = $.plot-height + 0.3 * ($.height - $.plot-height);
-    my $trafo = "translate($x-trafo,$y-trafo)";
-
-    my @svg = 'g' => [
-        :transform($trafo),
+    my $svg = $.apply-coordinate-transform(
         @svg_d,
-        'line' => [
-            :x1(0),
-            :y1(0),
-            :x2($.plot-width),
-            :y2(0),
-            :style('stroke:black; stroke-width: 2'),
-        ],
-        'line' => [
-            :x1(0),
-            :y1(0),
-            :x2(0),
-            :y2(-$.plot-height),
-            :style('stroke:black; stroke-width: 2'),
-        ],
-    ];
+        @.coordinate-system(),
+    );
 
-    return $full
-        ??
-            :svg([
-                    :width($.width), :height($.height),
-                    'xmlns' => 'http://www.w3.org/2000/svg',
-                    'xmlns:svg' => 'http://www.w3.org/2000/svg',
-                    'xmlns:xlink' => 'http://www.w3.org/1999/xlink',
-                    @svg
-            ])
-        !! @svg;
+    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
 method y-ticks($max_y, $scale_y) {
@@ -155,6 +128,35 @@ method plot-x-labels(:$label-skip, :$step_x) {
     }
 }
 
+method coordinate-system() {
+    # RAKUDO: can't use explicit return with a flattening list
+    'line' => [
+        :x1(0),
+        :y1(0),
+        :x2($.plot-width),
+        :y2(0),
+        :style('stroke:black; stroke-width: 2'),
+    ],
+    'line' => [
+        :x1(0),
+        :y1(0),
+        :x2(0),
+        :y2(-$.plot-height),
+        :style('stroke:black; stroke-width: 2'),
+    ];
+}
+
+multi method apply-coordinate-transform(*@things) {
+    my $x-trafo = 0.8 * ($.width - $.plot-width);
+    my $y-trafo = $.plot-height + 0.3 * ($.height - $.plot-height);
+    my $trafo = "translate($x-trafo,$y-trafo)";
+
+    return 'g' => [
+        :transform($trafo),
+        @things,
+    ];
+}
+
 method !linkify($key, $thing) {
     my $link = @.links[$key];
     defined($link)
@@ -164,6 +166,19 @@ method !linkify($key, $thing) {
                 $thing
             ])
         !! $thing;
+}
+
+method wrap-in-svg-header-if-necessary(*@things, :$wrap) {
+    return $wrap
+        ??
+            :svg([
+                    :width($.width), :height($.height),
+                    'xmlns' => 'http://www.w3.org/2000/svg',
+                    'xmlns:svg' => 'http://www.w3.org/2000/svg',
+                    'xmlns:xlink' => 'http://www.w3.org/1999/xlink',
+                    @things
+            ])
+        !!@things;
 }
 
 =begin Pod
