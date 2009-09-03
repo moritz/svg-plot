@@ -6,6 +6,8 @@ has $.label-font-size   = 14;
 has $.plot-width        = $.width  * 0.80;
 has $.plot-height       = $.height * 0.65;
 
+has $.title             = '';
+
 has &.y-tick-step       = -> $max_y {
     10 ** floor(log10($max_y)) / 5.0
 }
@@ -58,7 +60,7 @@ multi method plot(:$full = True, :$stacked-bars!) {
 
     my $svg = $.apply-coordinate-transform(
         @svg_d,
-        @.coordinate-system(),
+        @.eyecandy(),
     );
 
     @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
@@ -96,7 +98,7 @@ multi method plot(:$full = True, :$bars!) {
 
     my $svg = $.apply-coordinate-transform(
         @svg_d,
-        @.coordinate-system(),
+        @.eyecandy(),
     );
 
     @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
@@ -132,7 +134,7 @@ multi method plot(:$full = True, :$points!) {
 
     my $svg = $.apply-coordinate-transform(
         @svg_d,
-        @.coordinate-system(),
+        @.eyecandy(),
     );
 
     @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
@@ -174,7 +176,7 @@ multi method plot(:$full = True, :$lines!) {
 
     my $svg = $.apply-coordinate-transform(
         @svg_d,
-        @.coordinate-system(),
+        @.eyecandy(),
     );
 
     @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
@@ -222,6 +224,12 @@ method plot-x-labels(:$label-skip, :$step_x) {
     }
 }
 
+# plots coordinate system, title etc.
+multi method eyecandy() {
+    @.coordinate-system(),
+    @.plot-title,
+}
+
 method coordinate-system() {
     # RAKUDO: can't use explicit return with a flattening list
     'line' => [
@@ -240,9 +248,18 @@ method coordinate-system() {
     ];
 }
 
+multi method plot-title() {
+    return 'text' => [
+        :x($.width * 0.5),
+        :y(-$.plot-height - 0.1 * ($.height - $.plot-height) ),
+        :text-anchor<middle>,
+        $.title,
+    ];
+}
+
 multi method apply-coordinate-transform(*@things) {
     my $x-trafo = 0.8 * ($.width - $.plot-width);
-    my $y-trafo = $.plot-height + 0.3 * ($.height - $.plot-height);
+    my $y-trafo = $.plot-height + 0.35 * ($.height - $.plot-height);
     my $trafo = "translate($x-trafo,$y-trafo)";
 
     return 'g' => [
