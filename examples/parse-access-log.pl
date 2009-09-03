@@ -98,7 +98,7 @@ my $svg = SVG::Plot.new(
         :fill-width(1),
         :values([@visitor_per_day]),
         :labels(@dates),
-    ).plot();
+    ).plot(:bars);
 
 say SVG.serialize($svg);
 

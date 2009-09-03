@@ -38,7 +38,7 @@ my $svg = SVG::Plot.new(
         :labels(@date),
         :max-x-labels(20),
         :colors<lawngreen red blue yellow lightgrey>,
-    ).plot(:stacked);
+    ).plot(:stacked-bars);
 
 say SVG.serialize($svg);
 

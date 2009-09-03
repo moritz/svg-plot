@@ -21,56 +21,73 @@ has @.links  is rw;
 
 has @.colors = <blue red green yellow>;
 
-multi method plot(:$full = True, :$stacked = False) {
+multi method plot(:$full = True, :$stacked-bars!) {
 
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
-    my $max_y = 0;
-    if $stacked {
-        # maximum value of the sum over each column
-        $max_y = [max] @.values[0].keys.map: {
-            [+] @.values.map: -> $a { $a[$_] }
-        };
-    } else {
-        $max_y =  [max] @.values.map: { [max] @($_) };
-    }
+
+    # maximum value of the sum over each column
+    my $max_y      =  [max] @.values[0].keys.map: {
+        [+] @.values.map: -> $a { $a[$_] }
+    };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
     my $step_y     = $.plot-height / $max_y;
 
     my @svg_d = gather {
-        if $stacked {
-            my $bar-width = $.fill-width * $step_x;
-            for @.values[0].keys Z @.labels -> $k, $l {
-                my $y-offset  = 0;
-                for ^$datasets -> $d {
-                    my $v = @.values[$d][$k];
-                    my $p = 'rect' => [
-                        :y(-$v * $step_y - $y-offset),
-                        :x($k * $step_x),
-                        :width($bar-width),
-                        :height($v * $step_y),
-                        :style("fill:{ @.colors[$d % *] }; stroke: none"),
-                    ];
-                    $y-offset += $v * $step_y;
-                    take self!linkify($k, $p);
-                }
+        my $bar-width = $.fill-width * $step_x;
+        for @.values[0].keys Z @.labels -> $k, $l {
+            my $y-offset  = 0;
+            for ^$datasets -> $d {
+                my $v = @.values[$d][$k];
+                my $p = 'rect' => [
+                    :y(-$v * $step_y - $y-offset),
+                    :x($k * $step_x),
+                    :width($bar-width),
+                    :height($v * $step_y),
+                    :style("fill:{ @.colors[$d % *] }; stroke: none"),
+                ];
+                $y-offset += $v * $step_y;
+                take self!linkify($k, $p);
             }
-        } else {
-            my $bar-width = $.fill-width * $step_x / $datasets;
-            for @.values[0].keys Z @.labels -> $k, $l {
-                for ^$datasets -> $d {
-                    my $v = @.values[$d][$k];
-                    my $p = 'rect' => [
-                        :y(-$v * $step_y),
-                        :x($k * $step_x + $d * $bar-width),
-                        :width($bar-width),
-                        :height($v * $step_y),
-                        :style("fill:{ @.colors[$d % *] }"),
-                    ];
-                    take self!linkify($k, $p);
-                }
+        }
+
+        $.plot-x-labels(:$step_x, :$label-skip);
+        $.y-ticks($max_y, $step_y);
+    }
+
+    my $svg = $.apply-coordinate-transform(
+        @svg_d,
+        @.coordinate-system(),
+    );
+
+    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+}
+
+multi method plot(:$full = True, :$bars!) {
+
+    my $label-skip = ceiling(@.values[0] / $.max-x-labels);
+    my $max_x      = @.values[0].elems;
+    my $max_y      = [max] @.values.map: { [max] @($_) };
+    my $datasets   = +@.values;
+
+    my $step_x     = $.plot-width  / $max_x;
+    my $step_y     = $.plot-height / $max_y;
+
+    my @svg_d = gather {
+        my $bar-width = $.fill-width * $step_x / $datasets;
+        for @.values[0].keys Z @.labels -> $k, $l {
+            for ^$datasets -> $d {
+                my $v = @.values[$d][$k];
+                my $p = 'rect' => [
+                    :y(-$v * $step_y),
+                    :x($k * $step_x + $d * $bar-width),
+                    :width($bar-width),
+                    :height($v * $step_y),
+                    :style("fill:{ @.colors[$d % *] }"),
+                ];
+                take self!linkify($k, $p);
             }
         }
 
@@ -201,7 +218,7 @@ $very_early
                 width => 400,
                 height => 250,
                 values => @data,
-            ).plot();
+            ).plot(:stacked-bars);
     say SVG.serialize($svg);
 
 =head1 DESCRIPTION
@@ -229,9 +246,13 @@ compatible, or notify you on incompatible changes.
 Constructs a L<Plot::SVG> object. You can set various attributes as options,
 see their documentation below. No attribute is mandatory.
 
-=head2 method plot(:$full = True)
+=head2 multi method plot(:$$type!, :$full = True)
 If the argument C<$!full> is provided, the returned data structure contains
 only the body of the SVG, not the C<< <svg xmlns=...> >> header.
+
+Each multi method renders one type of chart, and has a mandatory named
+parameter with the name of the type. Currently available are C<bars> and
+C<stacked-bars>.
 
 =head1 Attributes
 
@@ -305,6 +326,15 @@ The example code in the F<examples> directory and the examples from the
 documentation can be used, modified and distributed freely without any
 restrictions (think "public domain", except that by German law the author
 can't place things into the public domain).
+
+=head1 WARRANTY EXCLUSION
+
+This software is provided as-is, in the hope that it is useful to somebody.
+Not fitness for a particular purpose or any kind of guarantuee of
+functionality is implied.
+
+No responsibilities are taken by author to the extend allowed by applicable
+law.
 
 =end Pod
 
