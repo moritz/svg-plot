@@ -72,7 +72,7 @@ multi method plot(:$full = True, :$pie!) {
             :h(0),
             :height($.height),
             :width($.width),
-            :style('fill: none; stroke: black; strok-width: 2'),
+            :style('fill: none; stroke: black; stroke-width: 2'),
         ],
         :wrap($full)
     );
