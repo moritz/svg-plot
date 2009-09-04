@@ -32,16 +32,29 @@ multi method plot(:$full = True, :$pie!) {
             :y1($cy + 1.1 * $cr * sin($legend-angle)),
             :y2($cy + 1.3 * $cr * sin($legend-angle)),
         ];
-        my $text-anchor;
-        if abs(cos($legend-angle)) < 0.5 {
-            $text-anchor = 'middle';
-        } else {
-            $text-anchor = cos($legend-angle) > 0 ?? 'start' !! 'end';
+
+        my ($text-anchor, $base-alignment);
+        given cos($legend-angle) {
+            if .abs < 0.4 {
+                $text-anchor = 'middle';
+            } else {
+                $text-anchor = $_ > 0 ?? 'start' !! 'end';
+            }
         }
+        given sin($legend-angle) {
+            if .abs < 0.4 {
+                $base-alignment = 'cenral';
+            } else {
+                $base-alignment = $_ < 0 ?? 'top' !! 'bottom';
+            }
+        }
+
+
         take 'text' => [
-            :x($cx + 1.4 * $cr * cos($legend-angle)),
-            :y($cy + 1.4 * $cr * sin($legend-angle)),
+            :x($cx + 1.5 * $cr * cos($legend-angle)),
+            :y($cy + 1.5 * $cr * sin($legend-angle)),
             :text-anchor($text-anchor),
+            :dominant-baseline($base-alignment),
             @.labels[$i],
         ] if defined @.labels[$i];
 
