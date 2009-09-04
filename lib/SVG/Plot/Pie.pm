@@ -12,14 +12,32 @@ multi method plot(:$full = True, :$pie!) {
     my @d         := @( @.values[0]);
     my $step       = 2.0 * pi / [+] @d;
     my $prev-angle = 0;
+    my $cr         = 0.35 * ($.plot-width min $.plot-height);
+    my $cx         = 0.5 * $.plot-width;
+    my $cy         = 0.5 * $.plot-height;
     my @svg = gather for @d.kv -> $i, $v {
         my $angle = $prev-angle + $v * $step;
         take $.arc(
             :start($prev-angle),
             :end($angle),
-            :color(@.colors[$i % *]),
+            :r($cr),
             :stroke<black>,
+            :color(@.colors[$i % *]),
         );
+        my $legend-angle = 0.5 * ($prev-angle + $angle);
+        take 'line' => [
+            :style('stroke: black; stroke-width: 1.2'),
+            :x1($cx + 1.1 * $cr * cos($legend-angle)),
+            :x2($cx + 1.3 * $cr * cos($legend-angle)),
+            :y1($cy + 1.1 * $cr * sin($legend-angle)),
+            :y2($cy + 1.3 * $cr * sin($legend-angle)),
+        ];
+        take 'text' => [
+            :x($cx + 1.4 * $cr * cos($legend-angle)),
+            :y($cy + 1.4 * $cr * sin($legend-angle)),
+            @.labels[$i],
+        ] if defined @.labels[$i];
+
         $prev-angle = $angle;
     }
     my $tx = 0.5 * ($.width - $.plot-width);
@@ -29,16 +47,23 @@ multi method plot(:$full = True, :$pie!) {
             :transform("translate($tx,$ty)"),
             @svg,
         ],
+        'rect' => [
+            :x(0),
+            :h(0),
+            :height($.height),
+            :width($.width),
+            :style('fill: none; stroke: black; strok-width: 2'),
+        ],
         :wrap($full)
     );
 }
 
 method arc(
-        $cx = 0.5 * $.plot-width,
-        $cy = 0.5 * $.plot-height,
-        $r = 0.5 * ($.plot-width min $.plot-height),
         :$start!,
         :end($phi)!,
+        :$cx = 0.5 * $.plot-width,
+        :$cy = 0.5 * $.plot-height,
+        :$r,
         :$color = 'red',
         :$stroke = 'none',
     ) {
