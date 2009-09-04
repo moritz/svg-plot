@@ -20,7 +20,7 @@ has @.values is rw;
 has @.labels is rw = @.values[0].keys;
 has @.links  is rw;
 
-has @.colors = <#2a2aff #ffff22 #ff2a2a #2aff2a #eebb00 #cc00ff>;
+has @.colors = <#3333ff #ffdd66 #aa2222 #228844 #eebb00 #8822bb>;
 
 multi method plot(:$full = True, :$stacked-bars!) {
 
