@@ -29,7 +29,7 @@ multi method plot(:$full = True, :$pie!) {
         my $incr = $i % 2 ?? 0.3 !! 0;
 
         take 'line' => [
-            :style('stroke: black; stroke-width: 1.2'),
+            :style('stroke: grey; stroke-width: 1.2'),
             :x1($cx + 1.1  * $cr * cos($legend-angle)),
             :y1($cy + 1.1  * $cr * sin($legend-angle)),
             :x2($cx + (1.35 + $incr) * $cr * cos($legend-angle)),
