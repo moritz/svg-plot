@@ -25,12 +25,15 @@ multi method plot(:$full = True, :$pie!) {
             :color(@.colors[$i % *]),
         );
         my $legend-angle = 0.5 * ($prev-angle + $angle);
+
+        my $incr = $i % 2 ?? 0.3 !! 0;
+
         take 'line' => [
             :style('stroke: black; stroke-width: 1.2'),
-            :x1($cx + 1.1 * $cr * cos($legend-angle)),
-            :x2($cx + 1.3 * $cr * cos($legend-angle)),
-            :y1($cy + 1.1 * $cr * sin($legend-angle)),
-            :y2($cy + 1.3 * $cr * sin($legend-angle)),
+            :x1($cx + 1.1  * $cr * cos($legend-angle)),
+            :y1($cy + 1.1  * $cr * sin($legend-angle)),
+            :x2($cx + (1.35 + $incr) * $cr * cos($legend-angle)),
+            :y2($cy + (1.35 + $incr) * $cr * sin($legend-angle)),
         ];
 
         my ($text-anchor, $base-alignment);
@@ -51,8 +54,8 @@ multi method plot(:$full = True, :$pie!) {
 
 
         take 'text' => [
-            :x($cx + 1.5 * $cr * cos($legend-angle)),
-            :y($cy + 1.5 * $cr * sin($legend-angle)),
+            :x($cx + (1.5 + $incr) * $cr * cos($legend-angle)),
+            :y($cy + (1.5 + $incr) * $cr * sin($legend-angle)),
             :text-anchor($text-anchor),
             :dominant-baseline($base-alignment),
             @.labels[$i],
