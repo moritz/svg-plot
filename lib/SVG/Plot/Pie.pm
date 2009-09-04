@@ -63,8 +63,17 @@ multi method plot(:$full = True, :$pie!) {
 
         $prev-angle = $angle;
     }
+    if defined $.title {
+        @svg.push: 'text' => [
+            :x($.plot-width / 2),
+            :y(-0.5 * ($.height - $.plot-height)),
+            :text-anchor<middle>,
+            :font-size<150%>,
+            $.title,
+        ];
+    }
     my $tx = 0.5 * ($.width - $.plot-width);
-    my $ty = 0.5 * ($.height - $.plot-height);
+    my $ty = 0.75 * ($.height - $.plot-height);
     return @.wrap-in-svg-header-if-necessary(
         'g' => [
             :transform("translate($tx,$ty)"),
