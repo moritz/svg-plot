@@ -1,3 +1,4 @@
+enum SVG::Plot::AxisPosition <Zero SmallestValue LargestValue>;
 class SVG::Plot;
 has $.height            = 200;
 has $.width             = 300;
@@ -55,7 +56,7 @@ multi method plot(:$full = True, :$stacked-bars!) {
         }
 
         $.plot-x-labels(:$step_x, :$label-skip);
-        $.y-ticks($max_y, $step_y);
+        $.y-ticks(0, $max_y, $step_y);
     }
 
     my $svg = $.apply-coordinate-transform(
@@ -71,21 +72,32 @@ multi method plot(:$full = True, :$bars!) {
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
     my $max_y      = [max] @.values.map: { [max] @($_) };
+
+    # the minimum is only interesting if it's smaller than 0.
+    # if all the values are non-negative, the bars should still start
+    # at 0
+    my $min_y      = ([min] @.values.map: { [min] @($_) }) min 0;
+
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
-    my $step_y     = $.plot-height / $max_y;
+    my $step_y     = $.plot-height / ($max_y - $min_y);
 
     my @svg_d = gather {
         my $bar-width = $.fill-width * $step_x / $datasets;
         for @.values[0].keys Z @.labels -> $k, $l {
             for ^$datasets -> $d {
                 my $v = @.values[$d][$k];
+                my ($y, $h) = (($v - $min_y) * $step_y, $v * $step_y);
+                if $h < 0 {
+                    $y = abs($min_y * $step_y);
+                    $h = abs($v * $step_y);
+                }
                 my $p = 'rect' => [
-                    :y(-$v * $step_y),
+                    :y(-$y),
                     :x($k * $step_x + $d * $bar-width),
                     :width($bar-width),
-                    :height($v * $step_y),
+                    :height(abs($h)),
                     :style("fill:{ @.colors[$d % *] }"),
                 ];
                 take self!linkify($k, $p);
@@ -93,7 +105,7 @@ multi method plot(:$full = True, :$bars!) {
         }
 
         $.plot-x-labels(:$step_x, :$label-skip);
-        $.y-ticks($max_y, $step_y);
+        $.y-ticks($min_y, $max_y, $step_y);
     }
 
     my $svg = $.apply-coordinate-transform(
@@ -129,7 +141,8 @@ multi method plot(:$full = True, :$points!) {
         }
 
         $.plot-x-labels(:$step_x, :$label-skip);
-        $.y-ticks($max_y, $step_y);
+        # TODO
+        $.y-ticks(0, $max_y, $step_y);
     }
 
     my $svg = $.apply-coordinate-transform(
@@ -171,7 +184,8 @@ multi method plot(:$full = True, :$lines!) {
         }
 
         $.plot-x-labels(:$step_x, :$label-skip);
-        $.y-ticks($max_y, $step_y);
+        # TODO
+        $.y-ticks(0, $max_y, $step_y);
     }
 
     my $svg = $.apply-coordinate-transform(
@@ -182,19 +196,22 @@ multi method plot(:$full = True, :$lines!) {
     @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
-method y-ticks($max_y, $scale_y) {
-    my $step = (&.y-tick-step).($max_y);
-    loop (my $y = 0; $y <= $max_y; $y += $step) {
+method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
+    my $step = (&.y-tick-step).($max_y - $min_y);
+    my $y_anchor = ($min_y / $step).Int * $step;
+    warn "y_anchor: $y_anchor min_y: $min_y";
+
+    loop (my $y = $y_anchor; $y <= $max_y; $y += $step) {
         take 'line' => [
-            :x1(-$.label-spacing / 2),
-            :x2( $.label-spacing / 2),
-            :y1(-$y * $scale_y),
-            :y2(-$y * $scale_y),
+            :x1($x - $.label-spacing / 2),
+            :x2($x + $.label-spacing / 2),
+            :y1(-($y - $min_y) * $scale_y),
+            :y2(-($y - $min_y) * $scale_y),
             :style('stroke:black; stroke-width: 1'),
         ];
         take 'text' => [
-            :x(- 1.5 * $.label-spacing),
-            :y(-$y * $scale_y),
+            :x($x - 1.5 * $.label-spacing),
+            :y(-($y - $min_y) * $scale_y),
             :font-size($.label-font-size),
             :text-anchor<end>,
             :dominant-baseline<middle>,
