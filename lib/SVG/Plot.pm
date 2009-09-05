@@ -158,17 +158,18 @@ multi method plot(:$full = True, :$lines!) {
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
     my $max_y      = [max] @.values.map: { [max] @($_) };
+    my $min_y      = [min] @.values.map: { [min] @($_) };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
-    my $step_y     = $.plot-height / $max_y;
+    my $step_y     = $.plot-height / ($max_y - $min_y);
 
     my @svg_d = gather {
         for ^$datasets -> $d {
             my @previous-coordinates;
             for @.values[0].keys Z @.labels -> $k, $l {
                 my $v = @.values[$d][$k];
-                my @coord = ($k + 0.5) * $step_x, -$v * $step_y;
+                my @coord = ($k + 0.5) * $step_x, - ($v - $min_y) * $step_y;
                 if @previous-coordinates {
                     my $p = 'line' => [
                         :x1(@previous-coordinates[0]),
@@ -184,8 +185,7 @@ multi method plot(:$full = True, :$lines!) {
         }
 
         $.plot-x-labels(:$step_x, :$label-skip);
-        # TODO
-        $.y-ticks(0, $max_y, $step_y);
+        $.y-ticks($min_y, $max_y, $step_y);
     }
 
     my $svg = $.apply-coordinate-transform(

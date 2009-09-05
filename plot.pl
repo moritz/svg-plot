@@ -16,7 +16,7 @@ my $svg = SVG::Plot.new(
             title      => 'Some data',
             :@labels,
             links => <http://en.wikipedia.org/wiki/The_quick_brown_fox_jumps_over_the_lazy_dog>,
-        ).plot(:points);
+        ).plot(:lines);
 
 say SVG.serialize($svg);
 
