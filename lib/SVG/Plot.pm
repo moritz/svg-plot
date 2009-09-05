@@ -323,8 +323,8 @@ $very_early
     use SVG;
     use SVG::Plot;
 
-    my @d1 = (0..100).map: { abs(sin($_ / 10.0)) };
-    my @d2 = (0..100).map: { abs(cos($_ / 10.0)) };
+    my @d1 = (0..100).map: { sin($_ / 10.0) };
+    my @d2 = (0..100).map: { cos($_ / 10.0) };
     my $svg = SVG::Plot.new(
                 width => 400,
                 height => 250,
