@@ -121,17 +121,18 @@ multi method plot(:$full = True, :$points!) {
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
     my $max_y      = [max] @.values.map: { [max] @($_) };
+    my $min_y      = [min] @.values.map: { [min] @($_) };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
-    my $step_y     = $.plot-height / $max_y;
+    my $step_y     = $.plot-height / ($max_y - $min_y);
 
     my @svg_d = gather {
         for @.values[0].keys Z @.labels -> $k, $l {
             for ^$datasets -> $d {
                 my $v = @.values[$d][$k];
                 my $p = 'circle' => [
-                    :cy(-$v * $step_y),
+                    :cy(-($v-$min_y) * $step_y),
                     :cx(($k + 0.5) * $step_x),
                     :r(3),
                     :style("fill:{ @.colors[$d % *] }"),
@@ -141,8 +142,7 @@ multi method plot(:$full = True, :$points!) {
         }
 
         $.plot-x-labels(:$step_x, :$label-skip);
-        # TODO
-        $.y-ticks(0, $max_y, $step_y);
+        $.y-ticks($min_y, $max_y, $step_y);
     }
 
     my $svg = $.apply-coordinate-transform(
@@ -199,7 +199,6 @@ multi method plot(:$full = True, :$lines!) {
 method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
     my $step = (&.y-tick-step).($max_y - $min_y);
     my $y_anchor = ($min_y / $step).Int * $step;
-    warn "y_anchor: $y_anchor min_y: $min_y";
 
     loop (my $y = $y_anchor; $y <= $max_y; $y += $step) {
         take 'line' => [
