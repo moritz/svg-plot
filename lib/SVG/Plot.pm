@@ -10,9 +10,9 @@ has $.label-font-size   = 12;
 has $.legend-font-size  = $.label-font-size;
 
 has @.legends is rw;
-has @.values is rw;
-has @.labels is rw = @.values[0].keys;
-has @.links  is rw;
+has @.values  is rw;
+has @.labels  is rw = @.values[0].keys;
+has @.links   is rw;
 
 has $.plot-width        = $.width  * 0.80;
 has $.plot-height       = $.height * (@.legends ?? 0.5 !! 0.65);
