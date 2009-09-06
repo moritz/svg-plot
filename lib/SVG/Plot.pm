@@ -200,12 +200,11 @@ multi method plot(:$full = True, :$lines!) {
     );
 
     my $lb = $.plot-legend-box();
-#    BEGIN { say "foo" };
-#    $lb = self.apply-coordinate-transform(
-#        $lb.svg,
-#        :translate(($.width - $lb.width) / 2, 5);
-#    );
-    @.wrap-in-svg-header-if-necessary($svg, @($lb.svg), :wrap($full));
+    $lb = self.apply-coordinate-transform(
+        @($lb.svg),
+        translate   => (($.width - $lb.width) / 2, $.height - $lb.height - 5),
+    );
+    @.wrap-in-svg-header-if-necessary($svg, $lb, :wrap($full));
 }
 
 method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
