@@ -1,12 +1,22 @@
 enum SVG::Plot::AxisPosition <Zero SmallestValue LargestValue>;
 class SVG::Plot;
-has $.height            = 200;
-has $.width             = 300;
+has $.height            = 300;
+has $.width             = 500;
 has $.fill-width        = 0.80;
-has $.label-font-size   = 14;
-has $.plot-width        = $.width  * 0.80;
-has $.plot-height       = $.height * 0.65;
+has $.label-font-size   = 12;
+has $.legend-font-size  = $.label-font-size;
 
+has @.legends is rw;
+has @.values is rw;
+has @.labels is rw = @.values[0].keys;
+has @.links  is rw;
+
+has $.plot-width        = $.width  * 0.80;
+has $.plot-height       = $.height * (@.legends ?? 0.5 !! 0.65);
+
+has $.legend-box-height = 10 + 1.4 * $.legend-font-size * @.legends;
+has $.legend-box-width  = 10 + 0.7 * $.legend-font-size
+                          * (([max] @.legends>>.chars) + 2);
 has $.title             = '';
 
 has &.tick-step       = -> $max {
@@ -16,10 +26,6 @@ has &.tick-step       = -> $max {
 has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
 
 has $.label-spacing     = ($.height - $.plot-height) / 20;
-
-has @.values is rw;
-has @.labels is rw = @.values[0].keys;
-has @.links  is rw;
 
 has @.colors = <#3333ff #ffdd66 #aa2222 #228844 #eebb00 #8822bb>;
 
@@ -59,7 +65,7 @@ multi method plot(:$full = True, :$stacked-bars!) {
         $.y-ticks(0, $max_y, $step_y);
     }
 
-    my $svg = $.apply-coordinate-transform(
+    my $svg = $.apply-standard-transform(
         @svg_d,
         @.eyecandy(),
     );
@@ -108,7 +114,7 @@ multi method plot(:$full = True, :$bars!) {
         $.y-ticks($min_y, $max_y, $step_y);
     }
 
-    my $svg = $.apply-coordinate-transform(
+    my $svg = $.apply-standard-transform(
         @svg_d,
         @.eyecandy(),
     );
@@ -145,7 +151,7 @@ multi method plot(:$full = True, :$points!) {
         $.y-ticks($min_y, $max_y, $step_y);
     }
 
-    my $svg = $.apply-coordinate-transform(
+    my $svg = $.apply-standard-transform(
         @svg_d,
         @.eyecandy(),
     );
@@ -188,12 +194,12 @@ multi method plot(:$full = True, :$lines!) {
         $.y-ticks($min_y, $max_y, $step_y);
     }
 
-    my $svg = $.apply-coordinate-transform(
+    my $svg = $.apply-standard-transform(
         @svg_d,
         @.eyecandy(),
     );
 
-    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+    @.wrap-in-svg-header-if-necessary($svg, @.plot-legend-box, :wrap($full));
 }
 
 method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
@@ -273,15 +279,23 @@ multi method plot-title() {
     ];
 }
 
-multi method apply-coordinate-transform(*@things) {
-    my $x-trafo = 0.8 * ($.width - $.plot-width);
-    my $y-trafo = $.plot-height + 0.35 * ($.height - $.plot-height);
-    my $trafo = "translate($x-trafo,$y-trafo)";
-
-    return 'g' => [
-        :transform($trafo),
+multi method apply-standard-transform(*@things) {
+    $.apply-coordinate-transform(
         @things,
-    ];
+        translate   => (
+            0.8 * ($.width - $.plot-width),
+            $.plot-height + (@.legends ?? 0.2 !! 0.35)
+            * ($.height - $.plot-height)
+        ),
+    );
+
+}
+
+multi method apply-coordinate-transform(*@things, :@translate) {
+    return 'g' => [
+        :transform("translate({@translate[0]},{@translate[1]})"),
+        @things,
+    ]
 }
 
 method linkify($key, *@things) {
@@ -293,6 +307,37 @@ method linkify($key, *@things) {
                 @things
             ])
         !! @things;
+}
+
+multi method plot-legend-box() {
+    return unless @.legends;
+
+    return gather {
+        take 'rect' => [
+            x       => 0,
+            y       => 0,
+            height  => $.legend-box-height,
+            width   => $.legend-box-width,
+            style   => 'stroke: black; strok-width: 0.5; fill: none',
+        ];
+        for @.legends.kv -> $i, $l {
+            take 'rect' => [
+                x       => 10,
+                y       => 5 + 1.4 * $i * $.legend-font-size,
+                height  => $.legend-font-size,
+                width   => $.legend-font-size,
+                style   => "stroke: black; stroke-width: 0.2; fill: "
+                           ~ @.colors[$i % *] ~ ";",
+            ];
+            take 'text' => [
+                x       => 2 * $.legend-font-size,
+                y       => 5 + 1.4 * $i * $.legend-font-size
+                           + 0.5 * $.legend-font-size,
+                dominant-baseline   => 'central',
+                $l,
+            ];
+        }
+    }
 }
 
 method wrap-in-svg-header-if-necessary(*@things, :$wrap) {
