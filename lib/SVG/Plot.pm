@@ -1,4 +1,7 @@
+use SVG::Box;
+
 enum SVG::Plot::AxisPosition <Zero SmallestValue LargestValue>;
+
 class SVG::Plot;
 has $.height            = 300;
 has $.width             = 500;
@@ -14,9 +17,6 @@ has @.links  is rw;
 has $.plot-width        = $.width  * 0.80;
 has $.plot-height       = $.height * (@.legends ?? 0.5 !! 0.65);
 
-has $.legend-box-height = 10 + 1.4 * $.legend-font-size * @.legends;
-has $.legend-box-width  = 10 + 0.7 * $.legend-font-size
-                          * (([max] @.legends>>.chars) + 2);
 has $.title             = '';
 
 has &.tick-step       = -> $max {
@@ -199,7 +199,13 @@ multi method plot(:$full = True, :$lines!) {
         @.eyecandy(),
     );
 
-    @.wrap-in-svg-header-if-necessary($svg, @.plot-legend-box, :wrap($full));
+    my $lb = $.plot-legend-box();
+#    BEGIN { say "foo" };
+#    $lb = self.apply-coordinate-transform(
+#        $lb.svg,
+#        :translate(($.width - $lb.width) / 2, 5);
+#    );
+    @.wrap-in-svg-header-if-necessary($svg, @($lb.svg), :wrap($full));
 }
 
 method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
@@ -310,14 +316,17 @@ method linkify($key, *@things) {
 }
 
 multi method plot-legend-box() {
+    my $height = 10 + 1.4 * $.legend-font-size * @.legends;
+    my $width  = 10 + 0.7 * $.legend-font-size
+                          * (([max] @.legends>>.chars) + 2);
     return unless @.legends;
 
-    return gather {
+    my $svg = gather {
         take 'rect' => [
             x       => 0,
             y       => 0,
-            height  => $.legend-box-height,
-            width   => $.legend-box-width,
+            height  => $height,
+            width   => $width,
             style   => 'stroke: black; strok-width: 0.5; fill: none',
         ];
         for @.legends.kv -> $i, $l {
@@ -338,6 +347,12 @@ multi method plot-legend-box() {
             ];
         }
     }
+
+    return SVG::Box.new(
+        svg     => $svg,
+        height => $height,
+        width  => $width,
+    );
 }
 
 method wrap-in-svg-header-if-necessary(*@things, :$wrap) {
