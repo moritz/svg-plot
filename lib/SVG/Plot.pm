@@ -350,8 +350,9 @@ multi method plot-legend-box() {
 
     return SVG::Box.new(
         svg     => $svg,
-        height => $height,
-        width  => $width,
+        height  => $height,
+        width   => $width,
+        name    => 'legend',
     );
 }
 
