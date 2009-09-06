@@ -9,8 +9,8 @@ has $.plot-height       = $.height * 0.65;
 
 has $.title             = '';
 
-has &.y-tick-step       = -> $max_y {
-    10 ** floor(log10($max_y)) / 5.0
+has &.tick-step       = -> $max {
+    10 ** floor(log10($max)) / 5
 }
 
 has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
@@ -51,7 +51,7 @@ multi method plot(:$full = True, :$stacked-bars!) {
                     :style("fill:{ @.colors[$d % *] }; stroke: none"),
                 ];
                 $y-offset += $v * $step_y;
-                take self!linkify($k, $p);
+                take $.linkify($k, $p);
             }
         }
 
@@ -100,7 +100,7 @@ multi method plot(:$full = True, :$bars!) {
                     :height(abs($h)),
                     :style("fill:{ @.colors[$d % *] }"),
                 ];
-                take self!linkify($k, $p);
+                take $.linkify($k, $p);
             }
         }
 
@@ -137,7 +137,7 @@ multi method plot(:$full = True, :$points!) {
                     :r(3),
                     :style("fill:{ @.colors[$d % *] }"),
                 ];
-                take self!linkify($k, $p);
+                take $.linkify($k, $p);
             }
         }
 
@@ -178,7 +178,7 @@ multi method plot(:$full = True, :$lines!) {
                         :y2(@coord[1]),
                         :style("stroke:{ @.colors[$d % *] }; stroke-width: 1.5"),
                     ];
-                    take self!linkify($k, $p);
+                    take $.linkify($k, $p);
                 }
                 @previous-coordinates = @coord;
             }
@@ -197,7 +197,7 @@ multi method plot(:$full = True, :$lines!) {
 }
 
 method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
-    my $step = (&.y-tick-step).($max_y - $min_y);
+    my $step = (&.tick-step).($max_y - $min_y);
     my $y_anchor = ($min_y / $step).Int * $step;
 
     loop (my $y = $y_anchor; $y <= $max_y; $y += $step) {
@@ -235,7 +235,7 @@ method plot-x-labels(:$label-skip, :$step_x) {
                 :dominant-baseline<middle>,
                 ~$l,
             ];
-            take self!linkify($k, $t);
+            take $.linkify($k, $t);
         }
     }
 }
@@ -284,7 +284,7 @@ multi method apply-coordinate-transform(*@things) {
     ];
 }
 
-method !linkify($key, $thing) {
+method linkify($key, $thing) {
     my $link = @.links[$key];
     defined($link)
         ?? ('a' => [
@@ -412,7 +412,7 @@ your bars, or to 1 if you don't  want spaces.
 =head2 $.label-font-size
 Font size for the axis labels
 
-=head2 &.y-tick-step
+=head2 &.tick-step
 Closure which computes the step size in which ticks and labels on the y axis
 are drawn. It receives the maximal C<y> value as a single positional argument.
 
