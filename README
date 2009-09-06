@@ -1,2 +1,5 @@
-SVG::Plot is a simple 2D bar chart plotter for Perl 6.
+SVG::Plot is a simple 2D chart plotter for Perl 6.
+It currently supports bars, stacked bars, lines and points (though only
+equally spaced in x direction).
+
 Initial announcement: http://perlgeek.de/blog-en/perl-6/svg-adventure.html
