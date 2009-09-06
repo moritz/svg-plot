@@ -11,55 +11,61 @@ multi method plot(:$full = True, :$pie!) {
     }
     my @d         := @( @.values[0]);
     my $step       = 2.0 * pi / [+] @d;
+    if 0 > [min] @d {
+        die "ERROR: can't plot pie chart with negative values";
+    }
     my $prev-angle = 0;
     my $cr         = 0.35 * ($.plot-width min $.plot-height);
     my $cx         = 0.5 * $.plot-width;
     my $cy         = 0.5 * $.plot-height;
     my @svg = gather for @d.kv -> $i, $v {
         my $angle = $prev-angle + $v * $step;
-        take $.arc(
-            :start($prev-angle),
-            :end($angle),
-            :r($cr),
-            :stroke<black>,
-            :color(@.colors[$i % *]),
-        );
-        my $legend-angle = 0.5 * ($prev-angle + $angle);
+        my @items = gather {
+            take $.arc(
+                :start($prev-angle),
+                :end($angle),
+                :r($cr),
+                :stroke<black>,
+                :color(@.colors[$i % *]),
+            );
+            my $legend-angle = 0.5 * ($prev-angle + $angle);
 
-        my $incr = $i % 2 ?? 0.3 !! 0;
+            my $incr = $i % 2 ?? 0.3 !! 0;
 
-        take 'line' => [
-            :style('stroke: grey; stroke-width: 1.2'),
-            :x1($cx + 1.1  * $cr * cos($legend-angle)),
-            :y1($cy + 1.1  * $cr * sin($legend-angle)),
-            :x2($cx + (1.35 + $incr) * $cr * cos($legend-angle)),
-            :y2($cy + (1.35 + $incr) * $cr * sin($legend-angle)),
-        ];
+            take 'line' => [
+                :style('stroke: grey; stroke-width: 1.2'),
+                :x1($cx + 1.1  * $cr * cos($legend-angle)),
+                :y1($cy + 1.1  * $cr * sin($legend-angle)),
+                :x2($cx + (1.35 + $incr) * $cr * cos($legend-angle)),
+                :y2($cy + (1.35 + $incr) * $cr * sin($legend-angle)),
+            ];
 
-        my ($text-anchor, $base-alignment);
-        given cos($legend-angle) {
-            if .abs < 0.4 {
-                $text-anchor = 'middle';
-            } else {
-                $text-anchor = $_ > 0 ?? 'start' !! 'end';
+            my ($text-anchor, $base-alignment);
+            given cos($legend-angle) {
+                if .abs < 0.4 {
+                    $text-anchor = 'middle';
+                } else {
+                    $text-anchor = $_ > 0 ?? 'start' !! 'end';
+                }
             }
-        }
-        given sin($legend-angle) {
-            if .abs < 0.4 {
-                $base-alignment = 'cenral';
-            } else {
-                $base-alignment = $_ < 0 ?? 'top' !! 'bottom';
+            given sin($legend-angle) {
+                if .abs < 0.4 {
+                    $base-alignment = 'cenral';
+                } else {
+                    $base-alignment = $_ < 0 ?? 'top' !! 'bottom';
+                }
             }
+
+
+            take 'text' => [
+                :x($cx + (1.5 + $incr) * $cr * cos($legend-angle)),
+                :y($cy + (1.5 + $incr) * $cr * sin($legend-angle)),
+                :text-anchor($text-anchor),
+                :dominant-baseline($base-alignment),
+                @.labels[$i],
+            ] if defined @.labels[$i];
         }
-
-
-        take 'text' => [
-            :x($cx + (1.5 + $incr) * $cr * cos($legend-angle)),
-            :y($cy + (1.5 + $incr) * $cr * sin($legend-angle)),
-            :text-anchor($text-anchor),
-            :dominant-baseline($base-alignment),
-            @.labels[$i],
-        ] if defined @.labels[$i];
+        take $.linkify($i, @items);
 
         $prev-angle = $angle;
     }

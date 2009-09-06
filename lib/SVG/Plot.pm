@@ -284,15 +284,15 @@ multi method apply-coordinate-transform(*@things) {
     ];
 }
 
-method linkify($key, $thing) {
+method linkify($key, *@things) {
     my $link = @.links[$key];
     defined($link)
         ?? ('a' => [
                 'xlink:href' => $link,
                 :target<_top>,
-                $thing
+                @things
             ])
-        !! $thing;
+        !! @things;
 }
 
 method wrap-in-svg-header-if-necessary(*@things, :$wrap) {
