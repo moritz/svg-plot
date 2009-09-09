@@ -240,7 +240,7 @@ method plot-x-labels(:$label-skip, :$step_x) {
             # y -> - x
             my $t = 'text' => [
                 :transform('rotate(-90)'),
-                :y(($k - 0.5 * $.fill-width) * $step_x),
+                :y(($k + 0.5 * $.fill-width) * $step_x),
                 :x(-$.label-spacing),
                 :font-size($.label-font-size),
                 :dominant-baseline<middle>,
