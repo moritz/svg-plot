@@ -236,14 +236,15 @@ method plot-x-labels(:$label-skip, :$step_x) {
             # note that the rotation is applied first,
             # so we have to  transform our
             # coordinates first:
-            # x -> - y
-            # y ->   x
+            # x ->   y
+            # y -> - x
             my $t = 'text' => [
-                :transform('rotate(90)'),
-                :y((-$k - 0.5 * $.fill-width) * $step_x),
-                :x($.label-spacing),
+                :transform('rotate(-90)'),
+                :y(($k - 0.5 * $.fill-width) * $step_x),
+                :x(-$.label-spacing),
                 :font-size($.label-font-size),
                 :dominant-baseline<middle>,
+                :text-anchor<end>,
                 ~$l,
             ];
             take $.linkify($k, $t);
