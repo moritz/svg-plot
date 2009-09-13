@@ -277,6 +277,9 @@ multi method plot-coordinate-system() {
 }
 
 multi method plot-title() {
+#    return SVG::Box.new(
+#
+#    );
     return 'text' => [
         :x($.width * 0.5),
         :y(-$.plot-height - 0.1 * ($.height - $.plot-height) ),
