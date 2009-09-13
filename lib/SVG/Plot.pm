@@ -199,11 +199,16 @@ multi method plot(:$full = True, :$lines!) {
         @.eyecandy(),
     );
 
-    my $lb = $.plot-legend-box();
-    $lb = self.apply-coordinate-transform(
-        @($lb.svg),
-        translate   => (($.width - $lb.width) / 2, $.height - $lb.height - 5),
-    );
+    my $lb;
+    if @.legends {
+        $lb = $.plot-legend-box();
+        $lb = self.apply-coordinate-transform(
+            @($lb.svg),
+            translate   => (($.width - $lb.width) / 2, $.height - $lb.height - 5),
+        );
+    } else {
+        $lb = [];
+    }
     @.wrap-in-svg-header-if-necessary($svg, $lb, :wrap($full));
 }
 
