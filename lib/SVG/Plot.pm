@@ -20,7 +20,7 @@ has $.plot-height       = $.height * (@.legends ?? 0.5 !! 0.65);
 has $.title             = '';
 
 has &.tick-step       = -> $max {
-    10 ** floor(log10($max)) / 5
+    10 ** floor($max.log10) / 5
 }
 
 has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
@@ -141,7 +141,7 @@ multi method plot(:$full = True, :$points!) {
                     :cy(-($v-$min_y) * $step_y),
                     :cx(($k + 0.5) * $step_x),
                     :r(3),
-                    :style("fill:{ @.colors[$d % *] }"),
+                    :style("fill:{ @.colors[$d % @.colors.elems] }"),
                 ];
                 take $.linkify($k, $p);
             }
@@ -182,7 +182,7 @@ multi method plot(:$full = True, :$lines!) {
                         :y1(@previous-coordinates[1]),
                         :x2(@coord[0]),
                         :y2(@coord[1]),
-                        :style("stroke:{ @.colors[$d % *] }; stroke-width: 1.5"),
+                        :style("stroke:{ @.colors[$d % @.colors.elems] }; stroke-width: 1.5"),
                     ];
                     take $.linkify($k, $p);
                 }
