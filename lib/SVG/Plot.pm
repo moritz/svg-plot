@@ -20,7 +20,7 @@ has $.plot-height       = $.height * (@.legends ?? 0.5 !! 0.65);
 has $.title             = '';
 
 has &.tick-step       = -> $max {
-    10 ** floor($max.log10) / 5
+    10 ** $max.log10.floor  / 5
 }
 
 has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
