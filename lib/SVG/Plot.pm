@@ -11,6 +11,7 @@ has $.legend-font-size  = $.label-font-size;
 
 has @.legends is rw;
 has @.values  is rw;
+has @.x       is rw;    # only used in 'xy' variants
 has @.labels  is rw = @.values[0].keys;
 has @.links   is rw;
 
@@ -19,8 +20,12 @@ has $.plot-height       = $.height * (@.legends ?? 0.5 !! 0.65);
 
 has $.title             = '';
 
-has &.tick-step       = -> $max {
-    10 ** $max.log10.floor  / 5
+has &.x-tick-step       = -> $max {
+    10 ** $max.log10.floor  / 2
+}
+
+has &.y-tick-step       = -> $max {
+    10 ** $max.log10.floor  / 2
 }
 
 has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
@@ -159,6 +164,95 @@ multi method plot(:$full = True, :$points!) {
     @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
+multi method plot(:$full = True, :$xy-points!) {
+    my $label-skip = ceiling(@.values[0] / $.max-x-labels);
+
+    my $max_x      = [max] @.x;
+    my $min_x      = [min] @.x;
+
+    my $max_y      = [max] @.values.map: { [max] @($_) };
+    my $min_y      = [min] @.values.map: { [min] @($_) };
+
+    my $datasets   = +@.values;
+
+    my $step_x     = $.plot-width  / ($max_x - $min_y);
+    my $step_y     = $.plot-height / ($max_y - $min_y);
+
+    my @svg_d = gather {
+        for @.values[0].keys Z @.labels -> $k, $l {
+            for ^$datasets -> $d {
+                my $v = @.values[$d][$k];
+                my $x = @.x[$k];
+
+                my $p = 'circle' => [
+                    :cy(-($v-$min_y) * $step_y),
+                    :cx(($x - $min_x) * $step_x),
+                    :r(3),
+                    :style("fill:{ @.colors[$d % @.colors.elems] }"),
+                ];
+                take $.linkify($k, $p);
+            }
+        }
+
+        $.x-ticks($min_x, $max_x, $step_x);
+        $.y-ticks($min_y, $max_y, $step_y);
+    }
+
+    my $svg = $.apply-standard-transform(
+        @svg_d,
+        @.eyecandy(),
+    );
+
+    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+}
+
+multi method plot(:$full = True, :$xy-lines!) {
+    my $label-skip = ceiling(@.values[0] / $.max-x-labels);
+
+    my $max_x      = [max] @.x;
+    my $min_x      = [min] @.x;
+
+    my $max_y      = [max] @.values.map: { [max] @($_) };
+    my $min_y      = [min] @.values.map: { [min] @($_) };
+
+    my $datasets   = +@.values;
+
+    my $step_x     = $.plot-width  / ($max_x - $min_y);
+    my $step_y     = $.plot-height / ($max_y - $min_y);
+
+    my @svg_d = gather {
+        for ^$datasets -> $d {
+            my ($prev-x, $prev-y);
+            for @.values[0].keys -> $k {
+                my $v = @.values[$d][$k];
+                my $x = @.x[$k];
+                if defined $prev-x {
+                    my $p = 'line' => [
+                        :x1($prev-x),
+                        :x2(($x - $min_x) * $step_x),
+                        :y1($prev-y),
+                        :y2(-($v-$min_y) * $step_y),
+                        :style("stroke:{ @.colors[$d % @.colors.elems] }; stroke-width: 1.5"),
+                    ];
+                    take $.linkify($k, $p);
+                }
+                $prev-x = ($x - $min_x) * $step_x;
+                $prev-y = -($v-$min_y) * $step_y;
+            }
+        }
+
+        $.x-ticks($min_x, $max_x, $step_x);
+        $.y-ticks($min_y, $max_y, $step_y);
+    }
+
+    my $svg = $.apply-standard-transform(
+        @svg_d,
+        @.eyecandy(),
+    );
+
+    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+}
+
 multi method plot(:$full = True, :$lines!) {
 
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
@@ -213,7 +307,7 @@ multi method plot(:$full = True, :$lines!) {
 }
 
 method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
-    my $step = (&.tick-step).($max_y - $min_y);
+    my $step = (&.y-tick-step).($max_y - $min_y);
     my $y_anchor = ($min_y / $step).Int * $step;
 
     loop (my $y = $y_anchor; $y <= $max_y; $y += $step) {
@@ -231,6 +325,29 @@ method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
             :text-anchor<end>,
             :dominant-baseline<middle>,
             ~ $y,
+        ];
+    }
+}
+
+method x-ticks($min_x, $max_x, $scale_x, $y = 0) {
+    my $step = (&.x-tick-step).($max_x - $min_x);
+    my $x_anchor = ($min_x / $step).Int * $step;
+
+    loop (my $x = $x_anchor; $x <= $max_x; $x += $step) {
+        take 'line' => [
+            :y1($y - $.label-spacing / 2),
+            :y2($y + $.label-spacing / 2),
+            :x1(($x - $min_x) * $scale_x),
+            :x2(($x - $min_x) * $scale_x),
+            :style('stroke:black; stroke-width: 1'),
+        ];
+        take 'text' => [
+            :y($y + 1.5 * ($.label-spacing + $.label-font-size)),
+            :x(($x - $min_x) * $scale_x),
+            :font-size($.label-font-size),
+            :text-anchor<middle>,
+            :dominant-baseline<middle>,
+            ~ $x,
         ];
     }
 }
@@ -483,9 +600,13 @@ your bars, or to 1 if you don't  want spaces.
 =head2 $.label-font-size
 Font size for the axis labels
 
-=head2 &.tick-step
+=head2 &.y-tick-step
 Closure which computes the step size in which ticks and labels on the y axis
 are drawn. It receives the maximal C<y> value as a single positional argument.
+
+=head2 &.x-tick-step
+Closure which computes the step size in which ticks and labels on the x axis
+are drawn. It receives the maximal C<x> value as a single positional argument.
 
 =head2 $.max-x-labels
 Maximal number of plotted labels in C<x> direction. If you experience
