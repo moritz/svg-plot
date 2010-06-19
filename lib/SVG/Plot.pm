@@ -179,7 +179,7 @@ multi method plot(:$full = True, :$xy-points!) {
     my $step_y     = $.plot-height / ($max_y - $min_y);
 
     my @svg_d = gather {
-        for @.values[0].keys Z @.labels -> $k, $l {
+        for @.values[0].keys -> $k {
             for ^$datasets -> $d {
                 my $v = @.values[$d][$k];
                 my $x = @.x[$k];
