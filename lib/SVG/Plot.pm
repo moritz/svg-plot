@@ -175,7 +175,7 @@ multi method plot(:$full = True, :$xy-points!) {
 
     my $datasets   = +@.values;
 
-    my $step_x     = $.plot-width  / ($max_x - $min_y);
+    my $step_x     = $.plot-width  / ($max_x - $min_x);
     my $step_y     = $.plot-height / ($max_y - $min_y);
 
     my @svg_d = gather {
@@ -217,7 +217,7 @@ multi method plot(:$full = True, :$xy-lines!) {
 
     my $datasets   = +@.values;
 
-    my $step_x     = $.plot-width  / ($max_x - $min_y);
+    my $step_x     = $.plot-width  / ($max_x - $min_x);
     my $step_y     = $.plot-height / ($max_y - $min_y);
 
     my @svg_d = gather {
