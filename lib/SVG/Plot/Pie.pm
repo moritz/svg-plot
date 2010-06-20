@@ -1,4 +1,6 @@
+use v6;
 use SVG::Plot;
+
 class SVG::Plot::Pie is SVG::Plot;
 
 multi method plot-coordinate-system() { (); }
