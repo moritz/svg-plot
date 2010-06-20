@@ -3,3 +3,6 @@ It currently supports bars, stacked bars, lines and points (both equally
 spaced with optional labels, or xy plots).
 
 Initial announcement: http://perlgeek.de/blog-en/perl-6/svg-adventure.html
+
+If you want to have a Makefile, please use ufo from http://github.com/masak/ufo/
+to generate one.
