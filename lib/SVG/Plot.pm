@@ -212,8 +212,16 @@ multi method plot(:$full = True, :$xy-lines!) {
     my $max_x      = [max] @.x;
     my $min_x      = [min] @.x;
 
+    if $max_x == $min_x {
+        die "There's just one x value ($max_x), refusing to plot\n";
+    }
+
     my $max_y      = [max] @.values.map: { [max] @($_) };
     my $min_y      = [min] @.values.map: { [min] @($_) };
+
+    if $max_y == $min_y {
+        die "There's just one y value ($max_x), refusing to plot\n";
+    }
 
     my $datasets   = +@.values;
 
