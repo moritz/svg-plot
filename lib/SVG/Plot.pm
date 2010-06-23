@@ -552,10 +552,10 @@ compatible, or notify you on incompatible changes.
 =head1 METHODS
 
 =head2 new(*%options)
-Constructs a L<Plot::SVG> object. You can set various attributes as options,
+Constructs a L<SVG::Plot> object. You can set various attributes as options,
 see their documentation below. No attribute is mandatory.
 
-=head2 multi method plot(:$$type!, :$full = True)
+=head2 multi method plot(:$type!, :$full = True)
 If the argument C<$!full> is provided, the returned data structure contains
 only the body of the SVG, not the C<< <svg xmlns=...> >> header.
 
