@@ -362,7 +362,7 @@ method x-ticks($min_x, $max_x, $scale_x, $y = 0) {
 
 method plot-x-labels(:$label-skip, :$step_x) {
     for @.values[0].keys Z @.labels -> $k, $l {
-        if $k !% $label-skip {
+        if $k %% $label-skip {
             # note that the rotation is applied first,
             # so we have to  transform our
             # coordinates first:
