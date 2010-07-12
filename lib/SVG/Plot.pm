@@ -496,9 +496,6 @@ method wrap-in-svg-header-if-necessary(*@things, :$wrap) {
         ??
             :svg([
                     :width($.width), :height($.height),
-                    'xmlns' => 'http://www.w3.org/2000/svg',
-                    'xmlns:svg' => 'http://www.w3.org/2000/svg',
-                    'xmlns:xlink' => 'http://www.w3.org/1999/xlink',
                     @things
             ])
         !!@things;
