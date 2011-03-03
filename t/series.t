@@ -17,4 +17,4 @@ $s.add_to_keys: 3;
 lives_ok { $s.prepare }, 'can prepare when counts are equal';
 is ~$s.keys, '1 2 3', 'can obtain keys';
 
-done_testing;
+done;

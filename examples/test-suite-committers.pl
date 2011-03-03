@@ -1,6 +1,6 @@
 use v6;
 BEGIN {
-    @*INC.push: '../lib', '../../svg/lib',
+    @*INC.unshift: '../lib', '../../svg/lib',
                 'lib', '../svg/lib';
 }
 use SVG;
