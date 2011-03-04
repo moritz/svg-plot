@@ -164,6 +164,69 @@ multi method plot(:$full = True, :$points!) {
     @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
+multi method plot(:$full = True, :$points-with-errors!,
+            :@lower!, :@upper!) {
+
+    my $label-skip = ceiling(@.values[0] / $.max-x-labels);
+    my $max_x      = @.values[0].elems;
+    my $max_y      = [max] @upper.map: { [max] @($_) };
+    my $min_y      = [min] @lower.map: { [min] @($_) };
+    my $datasets   = +@.values;
+
+    my $step_x     = $.plot-width  / $max_x;
+    my $step_y     = $.plot-height / ($max_y - $min_y);
+
+    my @svg_d = gather {
+        for @.values[0].keys Z @.labels -> $k, $l {
+            for ^$datasets -> $d {
+                my $v = @.values[$d][$k];
+                my $color = @.colors[$d % @.colors.elems];
+
+                my @p = 
+                    'line'   => [
+                        :x1(($k + 0.30) * $step_x),
+                        :x2(($k + 0.70) * $step_x),
+                        :y1(-(@upper[$d][$k] - $min_y) * $step_y),
+                        :y2(-(@upper[$d][$k] - $min_y) * $step_y),
+                        :style("stroke:$color; stroke-width: 1"),
+                    ],
+                    'line'   => [
+                        :x1(($k + 0.30) * $step_x),
+                        :x2(($k + 0.70) * $step_x),
+                        :y1(-(@lower[$d][$k] - $min_y) * $step_y),
+                        :y2(-(@lower[$d][$k] - $min_y) * $step_y),
+                        :style("stroke:$color; stroke-width: 1"),
+                    ],
+                    'line'   => [
+                        :x1(($k + 0.5) * $step_x),
+                        :x2(($k + 0.5) * $step_x),
+                        :y1(-(@lower[$d][$k] - $min_y) * $step_y),
+                        :y2(-(@upper[$d][$k] - $min_y) * $step_y),
+                        :style("stroke:$color; stroke-width: 1"),
+                    ],
+                
+                    'circle' => [
+                        :cy(-($v-$min_y) * $step_y),
+                        :cx(($k + 0.5) * $step_x),
+                        :r(3),
+                        :style("fill:$color");
+                    ];
+                take $.linkify($k, @p);
+            }
+        }
+
+        $.plot-x-labels(:$step_x, :$label-skip);
+        $.y-ticks($min_y, $max_y, $step_y);
+    }
+
+    my $svg = $.apply-standard-transform(
+        @svg_d,
+        @.eyecandy(),
+    );
+
+    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+}
+
 multi method plot(:$full = True, :$xy-points!) {
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
 
