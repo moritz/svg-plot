@@ -3,6 +3,5 @@
     "version"     : "*",
     "description" : "A Perl 6 charting and plotting library that produces SVG output",
     "depends"     : [ "SVG" ],
-    "repo-type"   : "git",
-    "repo-url"    : "git://github.com/moritz/svg-plot.git"
+    "source-url"  : "git://github.com/moritz/svg-plot.git"
 }
