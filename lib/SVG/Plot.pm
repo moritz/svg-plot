@@ -692,6 +692,8 @@ distance of labels and I<y> ticks.
 
 By default the C<y> axis is scaled between the minimum and maximum y values.
 Set this if you want the C<y> axis to scale off of a different lower bound.
+Only has an effect if the C<$.min-y-axis> value is less then the minimum C<y>
+value.
 
 =head1 LICENSE AND COPYRIGHT
 
