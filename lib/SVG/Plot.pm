@@ -34,7 +34,7 @@ has $.label-spacing     = ($.height - $.plot-height) / 20;
 
 has @.colors = <#3333ff #ffdd66 #aa2222 #228844 #eebb00 #8822bb>;
 
-has $.y-axis            = 0;
+has $.min-y-axis        = Inf;
 
 multi method plot(:$full = True, :$stacked-bars!) {
 
@@ -89,7 +89,7 @@ multi method plot(:$full = True, :$bars!) {
     # the minimum is only interesting if it's smaller than 0.
     # if all the values are non-negative, the bars should still start
     # at 0
-    my $min_y      = ([min] $.y-axis, @.values.map: { [min] @($_) }) min 0;
+    my $min_y      = ([min] $.min-y-axis, @.values.map: { [min] @($_) }) min 0;
 
     my $datasets   = +@.values;
 
@@ -134,7 +134,7 @@ multi method plot(:$full = True, :$points!) {
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
     my $max_y      = [max] @.values.map: { [max] @($_) };
-    my $min_y      = [min] $.y-axis, @.values.map: { [min] @($_) };
+    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_) };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
@@ -172,7 +172,7 @@ multi method plot(:$full = True, :$points-with-errors!,
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
     my $max_y      = [max] @upper.map: { [max] @($_) };
-    my $min_y      = [min] $.y-axis, @lower.map: { [min] @($_) };
+    my $min_y      = [min] $.min-y-axis, @lower.map: { [min] @($_) };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
@@ -236,7 +236,7 @@ multi method plot(:$full = True, :$xy-points!) {
     my $min_x      = [min] @.x;
 
     my $max_y      = [max] @.values.map: { [max] @($_) };
-    my $min_y      = [min] $.y-axis, @.values.map: { [min] @($_) };
+    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_) };
 
     my $datasets   = +@.values;
 
@@ -282,7 +282,7 @@ multi method plot(:$full = True, :$xy-lines!) {
     }
 
     my $max_y      = [max] @.values.map: { [max] @($_) };
-    my $min_y      = [min] $.y-axis, @.values.map: { [min] @($_) };
+    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_) };
 
     if $max_y == $min_y {
         die "There's just one y value ($max_x), refusing to plot\n";
@@ -331,7 +331,7 @@ multi method plot(:$full = True, :$lines!) {
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
     my $max_y      = [max] @.values.map: { [max] @($_) };
-    my $min_y      = [min] $.y-axis, @.values.map: { [min] @($_) };
+    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_) };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
@@ -687,6 +687,11 @@ dependent on C<$.plot-width> and C<$.label-font-size>.
 
 Distance between I<x> axis and labels. Also affects width of I<y> ticks and
 distance of labels and I<y> ticks.
+
+=head2 $.min-y-axis
+
+By default the C<y> axis is scaled between the minimum and maximum y values.
+Set this if you want the C<y> axis to scale off of a different lower bound.
 
 =head1 LICENSE AND COPYRIGHT
 
