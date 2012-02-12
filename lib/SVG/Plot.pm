@@ -7,16 +7,16 @@ has $.height            = 300;
 has $.width             = 500;
 has $.fill-width        = 0.80;
 has $.label-font-size   = 12;
-has $.legend-font-size  = $.label-font-size;
+has $.legend-font-size  = $!label-font-size;
 
 has @.legends is rw;
 has @.values  is rw;
 has @.x       is rw;    # only used in 'xy' variants
-has @.labels  is rw = @.values[0].keys;
+has @.labels  is rw = @!values[0].keys;
 has @.links   is rw;
 
-has $.plot-width        = $.width  * 0.80;
-has $.plot-height       = $.height * (@.legends ?? 0.5 !! 0.65);
+has $.plot-width        = $!width  * 0.80;
+has $.plot-height       = $!height * (@!legends ?? 0.5 !! 0.65);
 
 has $.title             = '';
 
@@ -28,9 +28,9 @@ has &.y-tick-step       = -> $max {
     10 ** $max.log10.floor  / 2
 }
 
-has $.max-x-labels      = $.plot-width / (1.5 * $.label-font-size);
+has $.max-x-labels      = $!plot-width / (1.5 * $!label-font-size);
 
-has $.label-spacing     = ($.height - $.plot-height) / 20;
+has $.label-spacing     = ($!height - $!plot-height) / 20;
 
 has @.colors = <#3333ff #ffdd66 #aa2222 #228844 #eebb00 #8822bb>;
 
