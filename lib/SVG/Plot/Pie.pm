@@ -79,7 +79,7 @@ multi method plot(:$full = True, :$pie!) {
             :x($.plot-width / 2),
             :y(-0.5 * ($.height - $.plot-height)),
             :text-anchor<middle>,
-            :font-size<150%>,
+            :font-size(1.5 * $.legend-font-size),
             $.title,
         ];
     }
