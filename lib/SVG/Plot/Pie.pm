@@ -3,6 +3,8 @@ use SVG::Plot;
 
 class SVG::Plot::Pie is SVG::Plot;
 
+has $.start-angle = 0;
+
 multi method plot-coordinate-system() { (); }
 multi method plot-x-labels() { (); }
 multi method y-ticks($max_y, $scale_y) { (); }
@@ -16,7 +18,7 @@ multi method plot(:$full = True, :$pie!) {
     if 0 > [min] @d {
         die "ERROR: can't plot pie chart with negative values";
     }
-    my $prev-angle = 0;
+    my $prev-angle = $!start-angle;
     my $cr         = 0.35 * ($.plot-width min $.plot-height);
     my $cx         = 0.5 * $.plot-width;
     my $cy         = 0.5 * $.plot-height;
