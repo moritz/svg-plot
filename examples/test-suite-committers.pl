@@ -27,7 +27,7 @@ my @names  = @c>>.key;
 my $svg = SVG::Plot::Pie.new(
         width   => 400,
         height  => 300,
-        values  => [@values],
+        values  => [$(@values)],
         labels  => @names,
         title   => 'Test suite committers',
     ).plot(:pie);
