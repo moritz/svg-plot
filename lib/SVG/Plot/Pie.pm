@@ -66,6 +66,7 @@ multi method plot(:$full = True, :$pie!) {
                 :y($cy + (1.5 + $incr) * $cr * sin($legend-angle)),
                 :text-anchor($text-anchor),
                 :dominant-baseline($base-alignment),
+                :font-size($.legend-font-size),
                 @.labels[$i],
             ] if defined @.labels[$i];
         }
