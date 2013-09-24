@@ -11,7 +11,7 @@ multi method new(*@args, *%named is copy) {
         %named<keys>   = @a>>.key;
         %named<values> = @a>>.value;
     }
-    my $new = self.bless(*, |%named);
+    my $new = self.bless(|%named);
     return $new;
 }
 
