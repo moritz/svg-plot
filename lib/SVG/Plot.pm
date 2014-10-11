@@ -62,7 +62,7 @@ multi method plot(:$full = True, :$stacked-bars!) {
                     :style("fill:{ @.colors[$d % *] }; stroke: none"),
                 ];
                 $y-offset += $v * $step_y;
-                take $.linkify($k, $p);
+                take |$.linkify($k, $p);
             }
         }
 
@@ -111,7 +111,7 @@ multi method plot(:$full = True, :$bars!) {
                     :height(abs($h)),
                     :style("fill:{ @.colors[$d % *] }"),
                 ];
-                take $.linkify($k, $p);
+                take |$.linkify($k, $p);
             }
         }
 
@@ -148,7 +148,7 @@ multi method plot(:$full = True, :$points!) {
                     :r(3),
                     :style("fill:{ @.colors[$d % @.colors.elems] }"),
                 ];
-                take $.linkify($k, $p);
+                take |$.linkify($k, $p);
             }
         }
 
@@ -211,7 +211,7 @@ multi method plot(:$full = True, :$points-with-errors!,
                         :r(3),
                         :style("fill:$color");
                     ];
-                take $.linkify($k, @p);
+                take |$.linkify($k, @p);
             }
         }
 
@@ -253,7 +253,7 @@ multi method plot(:$full = True, :$xy-points!) {
                     :r(3),
                     :style("fill:{ @.colors[$d % @.colors.elems] }"),
                 ];
-                take $.linkify($k, $p);
+                take |$.linkify($k, $p);
             }
         }
 
@@ -305,7 +305,7 @@ multi method plot(:$full = True, :$xy-lines!) {
                         :y2(-($v-$min_y) * $step_y),
                         :style("stroke:{ @.colors[$d % @.colors.elems] }; stroke-width: 1.5"),
                     ];
-                    take $.linkify($k, $p);
+                    take |$.linkify($k, $p);
                 }
                 $prev-x = ($x - $min_x) * $step_x;
                 $prev-y = -($v-$min_y) * $step_y;
@@ -349,7 +349,7 @@ multi method plot(:$full = True, :$lines!) {
                         :y2(@coord[1]),
                         :style("stroke:{ @.colors[$d % @.colors.elems] }; stroke-width: 1.5"),
                     ];
-                    take $.linkify($k, $p);
+                    take |$.linkify($k, $p);
                 }
                 @previous-coordinates = @coord;
             }
@@ -440,7 +440,7 @@ method plot-x-labels(:$label-skip, :$step_x) {
                 :text-anchor<end>,
                 ~$l,
             ];
-            take $.linkify($k, $t);
+            take |$.linkify($k, $t);
         }
     }
 }

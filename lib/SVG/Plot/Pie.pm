@@ -70,7 +70,7 @@ multi method plot(:$full = True, :$pie!) {
                 @.labels[$i],
             ] if defined @.labels[$i];
         }
-        take $.linkify($i, @items);
+        take |$.linkify($i, @items);
 
         $prev-angle = $angle;
     }
