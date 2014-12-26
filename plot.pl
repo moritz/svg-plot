@@ -20,5 +20,4 @@ say SVG.serialize:
             links => <http://en.wikipedia.org/wiki/The_quick_brown_fox_jumps_over_the_lazy_dog>,
     ).plot(:lines);
 
-
 # vim: ft=perl6 sw=4 ts=4 expandtab

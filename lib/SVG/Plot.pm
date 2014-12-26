@@ -442,7 +442,7 @@ method plot-x-labels(:$label-skip, :$step_x) {
                 :text-anchor<end>,
                 ~$l,
             ];
-            take |$.linkify($k, $t);
+            take @.linkify($k, $t);
         }
     }
 }
