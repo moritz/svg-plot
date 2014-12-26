@@ -583,13 +583,13 @@ $very_early
 
     my @d1 = (0..100).map: { sin($_ / 10.0) };
     my @d2 = (0..100).map: { cos($_ / 10.0) };
-    my $svg = SVG::Plot.new(
+    say SVG.serialize:
+        SVG::Plot.new(
                 width  => 400,
                 height => 250,
                 values => ([@d1], [@d2]),
                 title  => 'sin(x/10), cos(x/10)',
-            ).plot(:lines);
-    say SVG.serialize($svg);
+        ).plot(:lines);
 
 
 =head1 DESCRIPTION
