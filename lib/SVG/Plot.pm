@@ -42,8 +42,8 @@ multi method plot(:$full = True, :$stacked-bars!) {
     my $max_x      = @.values[0].elems;
 
     # maximum value of the sum over each column
-    my $max_y      =  [max] @.values[0].keys.map: {
-        [+] @.values.map: -> $a { $a[$_] }
+    my $max_y      =  [max] @.values[0].keys.for: {
+        [+] @.values.for: -> $a { $a[$_] }
     };
     my $datasets   = +@.values;
 
@@ -84,12 +84,12 @@ multi method plot(:$full = True, :$bars!) {
 
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
-    my $max_y      = [max] @.values.map: { [max] @($_) };
+    my $max_y      = [max] @.values.for: { [max] @($_) };
 
     # the minimum is only interesting if it's smaller than 0.
     # if all the values are non-negative, the bars should still start
     # at 0
-    my $min_y      = ([min] $.min-y-axis, @.values.map: { [min] @($_) }) min 0;
+    my $min_y      = ([min] $.min-y-axis, @.values.for: { [min] @($_) }) min 0;
 
     my $datasets   = +@.values;
 
@@ -133,8 +133,8 @@ multi method plot(:$full = True, :$points!) {
 
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
-    my $max_y      = [max] @.values.map: { [max] @($_) };
-    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_) };
+    my $max_y      = [max] @.values.for: { [max] @($_) };
+    my $min_y      = [min] $.min-y-axis, @.values.for: { [min] @($_) };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
@@ -171,8 +171,8 @@ multi method plot(:$full = True, :$points-with-errors!,
 
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
-    my $max_y      = [max] @upper.map: { [max] @($_) };
-    my $min_y      = [min] $.min-y-axis, @lower.map: { [min] @($_) };
+    my $max_y      = [max] @upper.for: { [max] @($_) };
+    my $min_y      = [min] $.min-y-axis, @lower.for: { [min] @($_) };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
@@ -235,8 +235,8 @@ multi method plot(:$full = True, :$xy-points!) {
     my $max_x      = [max] @.x;
     my $min_x      = [min] @.x;
 
-    my $max_y      = [max] @.values.map: { [max] @($_) };
-    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_) };
+    my $max_y      = [max] @.values.for: { [max] @($_) };
+    my $min_y      = [min] $.min-y-axis, @.values.for: { [min] @($_) };
 
     my $datasets   = +@.values;
 
@@ -281,8 +281,8 @@ multi method plot(:$full = True, :$xy-lines!) {
         die "There's just one x value ($max_x), refusing to plot\n";
     }
 
-    my $max_y      = [max] @.values.map: { [max] @($_) };
-    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_) };
+    my $max_y      = [max] @.values.for: { [max] @($_) };
+    my $min_y      = [min] $.min-y-axis, @.values.for: { [min] @($_) };
 
     if $max_y == $min_y {
         die "There's just one y value ($max_x), refusing to plot\n";
@@ -330,8 +330,8 @@ multi method plot(:$full = True, :$lines!) {
 
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
     my $max_x      = @.values[0].elems;
-    my $max_y      = [max] @.values.map: { [max] @($_) };
-    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_) };
+    my $max_y      = [max] @.values.for: { [max] @($_) };
+    my $min_y      = [min] $.min-y-axis, @.values.for: { [min] @($_) };
     my $datasets   = +@.values;
 
     my $step_x     = $.plot-width  / $max_x;
@@ -581,8 +581,8 @@ $very_early
     use SVG;
     use SVG::Plot;
 
-    my @d1 = (0..100).map: { sin($_ / 10.0) };
-    my @d2 = (0..100).map: { cos($_ / 10.0) };
+    my @d1 = (0..100).for: { sin($_ / 10.0) };
+    my @d2 = (0..100).for: { cos($_ / 10.0) };
     say SVG.serialize:
         SVG::Plot.new(
                 width  => 400,
