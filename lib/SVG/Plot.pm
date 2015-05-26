@@ -2,7 +2,7 @@ use SVG::Box;
 
 enum SVG::Plot::AxisPosition <Zero SmallestValue LargestValue>;
 
-class SVG::Plot;
+unit class SVG::Plot;
 has $.height            = 300;
 has $.width             = 500;
 has $.fill-width        = 0.80;

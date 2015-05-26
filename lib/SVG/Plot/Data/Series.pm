@@ -1,4 +1,4 @@
-class SVG::Plot::Data::Series;
+unit class SVG::Plot::Data::Series;
 
 has @.keys handles   (add_to_keys   => 'push', key_elems   => 'elems');
 has @.values handles (add_to_values => 'push', value_elems => 'elems');

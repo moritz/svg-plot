@@ -1,4 +1,4 @@
-class SVG::Plot::Data::Marker;
+unit class SVG::Plot::Data::Marker;
 
 has $.brush;            # TODO: default value
 has $.color = 'black';  # TODO: object
