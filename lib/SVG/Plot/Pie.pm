@@ -1,7 +1,7 @@
 use v6;
 use SVG::Plot;
 
-class SVG::Plot::Pie is SVG::Plot;
+unit class SVG::Plot::Pie is SVG::Plot;
 
 has $.start-angle = 0;
 

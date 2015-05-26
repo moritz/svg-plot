@@ -1,4 +1,4 @@
-class SVG::Box;
+unit class SVG::Box;
 
 has $.svg       is rw;
 has $.width     is rw;
