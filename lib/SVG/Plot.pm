@@ -52,7 +52,7 @@ multi method plot(:$full = True, :$stacked-bars!) {
 
     my @svg_d = gather {
         my $bar-width = $.fill-width * $step_x;
-        for @.values[0].keys Z @.labels -> $k, $l {
+        for flat @.values[0].keys Z @.labels -> $k, $l {
             my $y-offset  = 0;
             for ^$datasets -> $d {
                 my $v = @.values[$d][$k];
@@ -98,7 +98,7 @@ multi method plot(:$full = True, :$bars!) {
 
     my @svg_d = gather {
         my $bar-width = $.fill-width * $step_x / $datasets;
-        for @.values[0].keys Z @.labels -> $k, $l {
+        for flat @.values[0].keys Z @.labels -> $k, $l {
             for ^$datasets -> $d {
                 my $v = @.values[$d][$k];
                 my ($y, $h) = (($v - $min_y) * $step_y, $v * $step_y);
@@ -141,7 +141,7 @@ multi method plot(:$full = True, :$points!) {
     my $step_y     = $.plot-height / ($max_y - $min_y);
 
     my @svg_d = gather {
-        for @.values[0].keys Z @.labels -> $k, $l {
+        for flat @.values[0].keys Z @.labels -> $k, $l {
             for ^$datasets -> $d {
                 my $v = @.values[$d][$k];
                 my $p = 'circle' => [
@@ -179,7 +179,7 @@ multi method plot(:$full = True, :$points-with-errors!,
     my $step_y     = $.plot-height / ($max_y - $min_y);
 
     my @svg_d = gather {
-        for @.values[0].keys Z @.labels -> $k, $l {
+        for flat @.values[0].keys Z @.labels -> $k, $l {
             for ^$datasets -> $d {
                 my $v = @.values[$d][$k];
                 my $color = @.colors[$d % @.colors.elems];
@@ -340,7 +340,7 @@ multi method plot(:$full = True, :$lines!) {
     my @svg_d = gather {
         for ^$datasets -> $d {
             my @previous-coordinates;
-            for @.values[0].keys Z @.labels -> $k, $l {
+            for flat @.values[0].keys Z @.labels -> $k, $l {
                 my $v = @.values[$d][$k];
                 my @coord = ($k + 0.5) * $step_x, - ($v - $min_y) * $step_y;
                 if @previous-coordinates {
@@ -426,7 +426,7 @@ method x-ticks($min_x, $max_x, $scale_x, $y = 0) {
 }
 
 method plot-x-labels(:$label-skip, :$step_x) {
-    for @.values[0].keys Z @.labels -> $k, $l {
+    for flat @.values[0].keys Z @.labels -> $k, $l {
         if $k %% $label-skip {
             # note that the rotation is applied first,
             # so we have to  transform our
