@@ -1,7 +1,7 @@
 BEGIN { @*INC.push: 'lib' };
 use SVG::Plot::Data::Series;
 use Test;
-plan *;
+plan 8;
 
 ok my $s = SVG::Plot::Data::Series.new(), 'empty constructor is OK';
 dies-ok { $s.range() }, 'range of empty series is not OK';
@@ -16,5 +16,3 @@ dies-ok { $s.prepare }, 'cannot prepare with keys.elems != values.elemens';
 $s.add_to_keys: 3;
 lives-ok { $s.prepare }, 'can prepare when counts are equal';
 is ~$s.keys, '1 2 3', 'can obtain keys';
-
-done;
