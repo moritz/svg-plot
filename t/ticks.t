@@ -1,4 +1,4 @@
-BEGIN { @*INC.push: 'lib', '../lib' };
+use lib 'lib';
 use Test;
 
 plan 2;

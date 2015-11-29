@@ -1,8 +1,6 @@
 use v6;
-BEGIN {
-    @*INC.unshift: '../lib', '../../svg/lib',
-                'lib', '../svg/lib';
-}
+use lib '../lib', '../../svg/lib',
+        'lib', '../svg/lib';
 use SVG;
 use SVG::Plot;
 use SVG::Plot::Pie;

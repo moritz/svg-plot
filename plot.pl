@@ -1,6 +1,6 @@
 use v6;
 
-BEGIN { @*INC.push: '../svg/lib', 'lib' }
+use lib '../svg/lib', 'lib';
 
 use SVG;
 use SVG::Plot;

@@ -1,4 +1,4 @@
-BEGIN { @*INC.push: 'lib' };
+use lib 'lib';
 use SVG::Plot::Data::Series;
 use Test;
 plan 8;

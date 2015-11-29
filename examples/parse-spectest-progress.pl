@@ -1,10 +1,8 @@
 use v6;
-BEGIN {
-    @*INC.push: '../lib', 'lib',
+use lib          '../lib', 'lib',
                 '../../svg/lib','../svg/lib',
                 '../../Text--CSV/lib/',
                 '../../Text--CSV/';
-}
 use SVG;
 use SVG::Plot;
 use Text::CSV::Simple;
