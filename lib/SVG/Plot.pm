@@ -77,7 +77,7 @@ multi method plot(:$full = True, :$stacked-bars!) {
         @.eyecandy(),
     );
 
-    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+    $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
 multi method plot(:$full = True, :$bars!) {
@@ -126,7 +126,7 @@ multi method plot(:$full = True, :$bars!) {
         @.eyecandy(),
     );
 
-    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+    $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
 multi method plot(:$full = True, :$points!) {
@@ -163,7 +163,7 @@ multi method plot(:$full = True, :$points!) {
         @.eyecandy(),
     );
 
-    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+    $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
 multi method plot(:$full = True, :$points-with-errors!,
@@ -226,7 +226,7 @@ multi method plot(:$full = True, :$points-with-errors!,
         @.eyecandy(),
     );
 
-    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+    $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
 multi method plot(:$full = True, :$xy-points!) {
@@ -268,7 +268,7 @@ multi method plot(:$full = True, :$xy-points!) {
         @.eyecandy(),
     );
 
-    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+    $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
 multi method plot(:$full = True, :$xy-lines!) {
@@ -323,7 +323,7 @@ multi method plot(:$full = True, :$xy-lines!) {
         @.eyecandy(),
     );
 
-    @.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+    $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
 multi method plot(:$full = True, :$lines!) {
@@ -376,7 +376,7 @@ multi method plot(:$full = True, :$lines!) {
     } else {
         $lb = [];
     }
-    @.wrap-in-svg-header-if-necessary($svg, $lb, :wrap($full));
+    $.wrap-in-svg-header-if-necessary($svg, $lb, :wrap($full));
 }
 
 method y-ticks($min_y, $max_y, $scale_y, $x = 0) {
@@ -498,7 +498,7 @@ multi method apply-standard-transform(*@things) {
 multi method apply-coordinate-transform(*@things, :@translate) {
     return 'g' => [
         :transform("translate({@translate[0]},{@translate[1]})"),
-        @things,
+        |@things,
     ]
 }
 
@@ -508,9 +508,9 @@ method linkify($key, *@things) {
         ?? ('a' => [
                 'xlink:href' => $link,
                 :target<_top>,
-                @things
+                |@things
             ])
-        !! @things;
+        !! |@things;
 }
 
 multi method plot-legend-box() {
