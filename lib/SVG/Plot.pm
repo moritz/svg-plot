@@ -271,6 +271,49 @@ multi method plot(:$full = True, :$xy-points!) {
     $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
+multi method plot(:$full = True, :$bubbles!) {
+    my $label-skip = ceiling(@.values[0] / $.max-x-labels);
+
+    my $max_x      = [max] @.values.map: { [max] @($_[0] + $_[2]) };
+    my $min_x      = [min] @.values.map: { [min] @($_[0] - $_[2]) };
+    
+    my $max_y      = [max] @.values.map: { [max] @($_[1] + $_[2]) };
+    my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_[1] - $_[2]) };
+
+    my $datasets   = +@.values;
+
+    my $step_x     = $.plot-width  / ($max_x - $min_x);
+    my $step_y     = $.plot-height / ($max_y - $min_y);
+
+    my @svg_d = gather {
+        for @.values[0].keys -> $k {
+            for ^$datasets -> $d {
+                my $x = @.values[$d][$k][0];
+                my $v = @.values[$d][$k][1];
+                my $r = @.values[$d][$k][2];
+                
+                my $p = 'circle' => [
+                    :cy(-($v-$min_y) * $step_y),
+                    :cx(($x - $min_x) * $step_x),
+                    :r($r * abs(1 - $min_x) * $step_x),
+                    :style("fill:{ @.colors[$d % @.colors.elems] }"),
+                ];
+                take |$.linkify($k, $p);
+            }
+        }
+
+        $.x-ticks($min_x, $max_x, $step_x);
+        $.y-ticks($min_y, $max_y, $step_y);
+    }
+
+    my $svg = $.apply-standard-transform(
+        @svg_d,
+        @.eyecandy(),
+    );
+
+    $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
+}
+
 multi method plot(:$full = True, :$xy-lines!) {
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
 
@@ -561,9 +604,10 @@ method wrap-in-svg-header-if-necessary(*@things, :$wrap) {
         ??
             :svg([
                     :width($.width), :height($.height),
-                    @things
+                    |@things
             ])
-        !!@things;
+        !!
+	    |@things;
 }
 
 =begin Pod
