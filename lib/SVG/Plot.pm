@@ -560,10 +560,10 @@ method wrap-in-svg-header-if-necessary(*@things, :$wrap) {
     return $wrap
         ??
             :svg([
-                    :width($.width), :height($.height),
-                    @things
+                :width($.width), :height($.height),
+                |@things
             ])
-        !!@things;
+        !! |@things;
 }
 
 =begin Pod
