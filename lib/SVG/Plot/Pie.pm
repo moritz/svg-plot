@@ -13,7 +13,7 @@ multi method plot(:$full = True, :$pie!) {
     if @.values !== 1 {
         warn "Can only plot one data set in pie charts ({+@.values} given)";
     }
-    my @d         := @( @.values[0]);
+    my @d         := @( @.values[0] );
     my $step       = 2.0 * pi / [+] @d;
     if 0 > [min] @d {
         die "ERROR: can't plot pie chart with negative values";
@@ -73,7 +73,8 @@ multi method plot(:$full = True, :$pie!) {
         take |$.linkify($i, @items);
 
         $prev-angle = $angle;
-    }
+    }.flat;
+
     if defined $.title {
         @svg.push: 'text' => [
             :x($.plot-width / 2),
@@ -85,10 +86,10 @@ multi method plot(:$full = True, :$pie!) {
     }
     my $tx = 0.5 * ($.width - $.plot-width);
     my $ty = 0.75 * ($.height - $.plot-height);
-    return @.wrap-in-svg-header-if-necessary(
+    return $.wrap-in-svg-header-if-necessary(
         'g' => [
             :transform("translate($tx,$ty)"),
-            @svg,
+            |@svg,
         ],
         'rect' => [
             :x(0),
@@ -117,9 +118,11 @@ method arc(
 
     my $c = join ' ', @commands;
     return 'g' => [
-        :stroke($stroke),
-        :fill($color),
-        path => [ :d($c) ],
+        path => [ 
+            :stroke($stroke),
+            :fill($color),
+            :d($c) 
+        ],
     ];
 }
 
