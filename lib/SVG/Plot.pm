@@ -271,8 +271,13 @@ multi method plot(:$full = True, :$xy-points!) {
     $.wrap-in-svg-header-if-necessary($svg, :wrap($full));
 }
 
-multi method plot(:$full = True, :$bubbles!) {
+multi method plot(:$full = True, :$bubbles!, :$opacity) {
     my $label-skip = ceiling(@.values[0] / $.max-x-labels);
+
+    if $opacity.defined {
+        die "Opacity must be a value between 0 and 1"
+            unless $opacity >=0 && $opacity <= 1;
+    }
 
     my $max_x      = [max] @.values.map: { [max] @($_[0] + $_[2]) };
     my $min_x      = [min] @.values.map: { [min] @($_[0] - $_[2]) };
@@ -291,12 +296,14 @@ multi method plot(:$full = True, :$bubbles!) {
                 my $x = @.values[$d][$k][0];
                 my $v = @.values[$d][$k][1];
                 my $r = @.values[$d][$k][2];
+                my $style = "fill:{ @.colors[$d % @.colors.elems] }";
+                $style ~= ";fill-opacity:{$opacity}" if $opacity.defined;
                 
                 my $p = 'circle' => [
                     :cy(-($v-$min_y) * $step_y),
                     :cx(($x - $min_x) * $step_x),
                     :r($r * abs(1 - $min_x) * $step_x),
-                    :style("fill:{ @.colors[$d % @.colors.elems] }"),
+                    :$style
                 ];
                 take |$.linkify($k, $p);
             }

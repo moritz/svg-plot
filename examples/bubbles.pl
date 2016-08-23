@@ -26,5 +26,5 @@ my $svg = SVG::Plot.new(
     values  		=> [ $(@data1), $(@data2) ],
     title   		=> 'Bubbles!',
     min-y-axis 		=> 0
-).plot(:bubbles);
+).plot(:bubbles, :opacity(0.8));
 say SVG.serialize($svg);
