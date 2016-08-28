@@ -20,6 +20,8 @@ has $.plot-height       = $!height * (@!legends ?? 0.5 !! 0.65);
 
 has $.title             = '';
 
+has $.background;
+
 has &.x-tick-step       = -> $max {
     10 ** $max.log10.floor  / 2
 }
@@ -497,6 +499,15 @@ method plot-x-labels(:$label-skip, :$step_x) {
     }
 }
 
+method draw-background {
+	return unless $.background.defined;
+	'rect' => [
+		:width($.width),
+		:height($.height),
+		:style("fill: {$.background}"),
+	];
+}
+
 # plots coordinate system, title etc.
 multi method eyecandy() {
     @.plot-coordinate-system,
@@ -607,6 +618,7 @@ multi method plot-legend-box() {
 }
 
 method wrap-in-svg-header-if-necessary(*@things, :$wrap) {
+	@things.unshift: |@.draw-background;
     return $wrap
         ??
             :svg([

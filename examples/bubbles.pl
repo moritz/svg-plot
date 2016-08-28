@@ -24,6 +24,7 @@ my $svg = SVG::Plot.new(
     width   		=> 500,
     height  		=> 300,
     values  		=> [ $(@data1), $(@data2) ],
+    background		=> 'gray',
     title   		=> 'Bubbles!',
     min-y-axis 		=> 0
 ).plot(:bubbles, :opacity(0.8));

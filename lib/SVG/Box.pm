@@ -1,10 +1,11 @@
 unit class SVG::Box;
 
-has $.svg       is rw;
-has $.width     is rw;
-has $.height    is rw;
-has $.x         is rw;
-has $.y         is rw;
+has $.svg       	is rw;
+has $.width     	is rw;
+has $.height    	is rw;
+has $.x         	is rw;
+has $.y         	is rw;
+has $.background	is rw;
 
 has $.name;
 
