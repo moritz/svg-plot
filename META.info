@@ -1,4 +1,5 @@
 {
+    "perl"        : "6.*",
     "name"        : "SVG::Plot",
     "version"     : "*",
     "description" : "A Perl 6 charting and plotting library that produces SVG output",
