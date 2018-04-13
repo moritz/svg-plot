@@ -186,7 +186,7 @@ multi method plot(:$full = True, :$points-with-errors!,
                 my $v = @.values[$d][$k];
                 my $color = @.colors[$d % @.colors.elems];
 
-                my @p = 
+                my @p =
                     'line'   => [
                         :x1(($k + 0.30) * $step_x),
                         :x2(($k + 0.70) * $step_x),
@@ -208,7 +208,7 @@ multi method plot(:$full = True, :$points-with-errors!,
                         :y2(-(@upper[$d][$k] - $min_y) * $step_y),
                         :style("stroke:$color; stroke-width: 1"),
                     ],
-                
+
                     'circle' => [
                         :cy(-($v-$min_y) * $step_y),
                         :cx(($k + 0.5) * $step_x),
@@ -283,7 +283,7 @@ multi method plot(:$full = True, :$bubbles!, :$opacity) {
 
     my $max_x      = [max] @.values.map: { [max] @($_[0] + $_[2]) };
     my $min_x      = [min] @.values.map: { [min] @($_[0] - $_[2]) };
-    
+
     my $max_y      = [max] @.values.map: { [max] @($_[1] + $_[2]) };
     my $min_y      = [min] $.min-y-axis, @.values.map: { [min] @($_[1] - $_[2]) };
 
@@ -300,7 +300,7 @@ multi method plot(:$full = True, :$bubbles!, :$opacity) {
                 my $r = @.values[$d][$k][2];
                 my $style = "fill:{ @.colors[$d % @.colors.elems] }";
                 $style ~= ";fill-opacity:{$opacity}" if $opacity.defined;
-                
+
                 my $p = 'circle' => [
                     :cy(-($v-$min_y) * $step_y),
                     :cx(($x - $min_x) * $step_x),
@@ -353,9 +353,9 @@ multi method plot(:$full = True, :$xy-lines!) {
                 my $x = @.x[$k];
                 if defined $prev-x {
                     my $p = 'line' => [
-                        :x1($prev-x),
+                        :x1($prev-x.clone),
                         :x2(($x - $min_x) * $step_x),
-                        :y1($prev-y),
+                        :y1($prev-y.clone),
                         :y2(-($v-$min_y) * $step_y),
                         :style("stroke:{ @.colors[$d % @.colors.elems] }; stroke-width: 1.5"),
                     ];
